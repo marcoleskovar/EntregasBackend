@@ -1,0 +1,29 @@
+[
+  {
+    "id": 1,
+    "title": "Producto 1",
+    "description": "Descripcion Producto 1",
+    "price": 1000,
+    "thumbnail": "./img/prod-1.webp",
+    "code": "A1",
+    "stock": 30
+  },
+  {
+    "id": 2,
+    "title": "MODIFICADO",
+    "description": "Descripcion Producto MODIFICADO",
+    "price": 30000,
+    "thumbnail": "./img/prod-1.webp",
+    "code": "MODIFICADO",
+    "stock": 30
+  },
+  {
+    "id": 4,
+    "title": "Producto 4",
+    "description": "Descripcion Producto 1",
+    "price": 4500,
+    "thumbnail": "./img/prod-1.webp",
+    "code": "A4",
+    "stock": 30
+  }
+]
