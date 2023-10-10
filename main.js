@@ -75,7 +75,7 @@ class ProductManager{
                 await fs.promises.writeFile(this._path, JSON.stringify(this._products, null, 2), this._format);
                 return console.log('Producto actualizado correctamente.');
             } else {
-                console.error('Producto no encontrado.');
+                console.error('Producto no encontrado.')
             }
         } catch (error) {
             console.error(error);
