@@ -1,4 +1,4 @@
-const fs = require('fs')
+const fs = require ('fs')
 
 class ProductManager{
     constructor(){
@@ -7,93 +7,129 @@ class ProductManager{
         this._path = './productList.json'
         this._format = 'utf-8'
     }
-    
-    addProduct = async({ title, description, price, thumbnail, code, stock }) => {
+
+    fileContent = async (path, format) => {
         try{
-            if (!title || !description || !price || !thumbnail || !code || !stock) return console.log('Completa todos los campos');
+            const fileContent = await fs.promises.readFile(path, format)
+            const result = JSON.parse(fileContent)
+            return result
+        }
+        catch (error){
+            return console.error('HA OCURRIDO UN ERROR EN "fileContent', error)
+        }
+    }
 
-            const fileContent = await fs.promises.readFile(this._path, this._format);
-            this._products = JSON.parse(fileContent);
-
-            if (this._products.some(product => product.code === code)) return console.log(`El producto que intentas agregar tiene el mismo code que otro producto (${code})`);
+    lastId = async () => {
+        try{
+            const fileContent = await this.fileContent(this._path, this._format)
+            const maxId = fileContent.reduce((max, product) => {
+                return product.id > max ? product.id : max
+            }, 0)
+            return maxId
+        }
+        catch (error){
+            return console.error('HA OCURRIDO UN ERROR EN "lastId"', error)
+        }
+    }
+    
+    addProduct = async ({title, description, price, thumbnail, code, stock}) => {
+        try{
+            if (!title || !description || !price || !thumbnail || !code || !stock) return console.error(`\naddProduct: ${title} - incomplete\n`)
+    
+            if (!fs.existsSync(this._path)){
+                await this.getProducts()
+            }else{
+                this._id = await this.lastId() + 1
+            }
+    
+            this._products = await this.fileContent(this._path, this._format)
+    
+            if (this._products.some(product => product.code === code)) return console.error(`El producto "${title}" tiene el mismo code que otro producto ("${code}")`)
+    
             this._products.push({
-                id: this._id++,
+                id: this._id,
                 title,
                 description,
                 price,
                 thumbnail,
                 code,
-                stock,
-            });
-            
-            await fs.promises.writeFile(this._path, JSON.stringify(this._products, null, 2), this._format);
-            console.log(`Se agregó correctamente el producto: ${title}`);
-        }catch(error){
-            console.log(error);
+                stock
+            })
+    
+            await fs.promises.writeFile(this._path, JSON.stringify(this._products, null, 2), this._format)
+            console.log(`\nSe agregó correctamente el producto: ${title}\n`)
+    
+            return await this.getProducts()
         }
-    };
-    getProducts = async() => {
+        catch (error){
+            return console.error('HA OCURRIDO UN ERROR EN "addProduct"', error)
+        }
+    }
+    
+    getProducts = async () => {
         try{
-            const fileContent = await fs.promises.readFile(this._path, this._format);
-            this._products = JSON.parse(fileContent);
-            console.log(this._products);
-        }catch(error){
-            if (error.code === 'ENOENT') {
-                await fs.promises.writeFile(this._path, '[]', this._format);
-                console.log('El archivo "productList.json" no existía y fue creado.');
-            } else {
-                console.log('HA OCURRIDO UN ERROR', error);
+            if (fs.existsSync(this._path)){
+                this._products = await this.fileContent(this._path, this._format)
+                console.log(`\n===============LISTA DE PRODUCTOS===============\n`)
+                return console.log(this._products)
+            }else{
+                return fs.promises.writeFile(this._path, '[]', this._format)
             }
+        }
+        catch (error){
+            return console.error('HA OCURRIDO UN ERROR EN "getProducts"', error)
         }
     }
 
-    getProductById = async(id) => {
+    getProductById = async (id) => {
         try{
-            const fileContent = await fs.promises.readFile(this._path, this._format);
-            this._products = JSON.parse(fileContent)
-            const productoEncontrado = this._products.find(product => product.id === id)
-            productoEncontrado ? console.log(productoEncontrado): console.error('Not Found');
-            return console.log('===============PRODUCTO ENCONTRADO===============');
+            this._products = await this.fileContent(this._path, this._format)
+            const foundProduct = this._products.find(product => product.id === id)
+            return foundProduct ? console.log(`\n===============PRODUCTO ENCONTRADO===============\n`, foundProduct) : console.error(`\ngetProductById: Not Found\n`)
         }
-        catch(error){
-            console.log(error);
+        catch (error){
+            console.error('HA OCURRIDO UN ERROR EN "getProductById"', error)
         }
     }
 
     updateProduct = async (id, property) => {
-        try {
-            const fileContent = await fs.promises.readFile(this._path, this._format);
-            this._products = JSON.parse(fileContent);
-            const productIndex = this._products.findIndex(product => product.id === id);
-            if (productIndex !== -1) {
-                for (let propiedad in property) {
-                    if (this._products[productIndex].hasOwnProperty(propiedad)) {
-                        this._products[productIndex][propiedad] = property[propiedad];
-                    }
+        try{
+            this._products = await this.fileContent(this._path, this._format)
+            const foundProduct = this._products.findIndex(product => product.id === id)
+            if (foundProduct !== -1){
+                if ('id' in property){
+                    console.error(`\nupdateProduct: Modifying the ID directly is not allowed\n`)
+                    delete property.id
                 }
-    
-                await fs.promises.writeFile(this._path, JSON.stringify(this._products, null, 2), this._format);
-                return console.log('Producto actualizado correctamente.');
-            } else {
-                console.error('Producto no encontrado.')
+                this._products[foundProduct] = Object.assign({}, this._products[foundProduct], property)
+                console.log(`\n===============PRODUCTO MODIFICADO (ID: ${id})===============\n`)
+                return await fs.promises.writeFile(this._path, JSON.stringify(this._products, null, 2), this._format)
+            }else{
+                console.error(`\nupdateProduct: Not Found\n`)
             }
-        } catch (error) {
-            console.error(error);
+        } catch (error){
+            console.error(error)
         }
-    };
+    }
 
     deleteProduct = async (id) => {
-        const fileContent = await fs.promises.readFile(this._path, this._format)
-        this._products = JSON.parse (fileContent)
-        const productoEncontrado = this._products.filter(products => products.id !== id)
-        await fs.promises.writeFile(this._path, JSON.stringify(productoEncontrado, null, 2))
-        return console.log('===============PRODUCTO MODIFICADO===============')
+        try{
+            this._products = await this.fileContent(this._path, this._format)
+            const productToDelete = this._products.filter(products => products.id !== id)
+            const deletedProduct = this._products.find(products => products.id === id)
+            deletedProduct ? console.log(`\n===============PRODUCTO ELIMINADO===============\n`, deletedProduct) : console.error(`\ndeleteProduct: Not Found\n`)
+            await fs.promises.writeFile(this._path, JSON.stringify(productToDelete, null, 2))
+            return await this.getProducts()
+        }
+        catch (error){
+            console.error('HA OCURRIDO UN ERROR EN "deleteProduct"', error)
+        }
     }
 }
-
-const productManager = new ProductManager()
-
-const productToAdd = {
+    
+const productManager = new ProductManager
+    
+const firstProduct = {
     title: 'Producto 1',
     description: 'Descripcion Producto 1',
     price: 1000,
@@ -102,49 +138,42 @@ const productToAdd = {
     stock: 30,
 }
 
-const productToAdd2 = {
+const secondProduct = {
     title: 'Producto 2',
-    description: 'Descripcion Producto 1',
-    price: 400,
+    description: 'Descripcion Producto 2',
+    price: 200,
     thumbnail: './img/prod-1.webp',
     code: 'A2',
-    stock: 30,
+    stock: 4,
 }
 
-const productToAdd3 = {
+const thirdProduct = {
     title: 'Producto 3',
-    description: 'Descripcion Producto 1',
-    price: 2100,
+    description: 'Descripcion Producto 3',
+    price: 4000,
     thumbnail: './img/prod-1.webp',
     code: 'A3',
-    stock: 30,
+    stock: 39,
 }
-const productToAdd4 = {
+
+const fourthProduct = {
     title: 'Producto 4',
-    description: 'Descripcion Producto 1',
-    price: 4500,
+    description: 'Descripcion Producto 4',
+    price: 500,
     thumbnail: './img/prod-1.webp',
     code: 'A4',
-    stock: 30,
+    stock: 21,
 }
-
+    
 const run = async () => {
-    await productManager.getProducts()
-    await productManager.addProduct(productToAdd)
-    await productManager.addProduct(productToAdd2)
-    await productManager.addProduct(productToAdd3)
-    await productManager.addProduct(productToAdd4)
-    await productManager.getProductById(2)
-    await productManager.deleteProduct(3)
-    await productManager.updateProduct(2, {
-        title: 'MODIFICADO',
-        description: 'Descripcion Producto MODIFICADO',
-        price: 30000,
-        thumbnail: './img/prod-1.webp',
-        code: 'MODIFICADO'
-    })
-    await productManager.getProducts()
+    await productManager.addProduct(firstProduct)
+    await productManager.addProduct(secondProduct)
+    await productManager.addProduct(thirdProduct)
+    await productManager.addProduct(fourthProduct)
+    await productManager.getProductById(1)
+    await productManager.updateProduct(2, {id: 'X', title: 'PRODUCTO POST-MODIFICACION', price: 40})
+    await productManager.deleteProduct(4)
 }
-
+    
 run()
-    .catch(error => console.error(error))
+    .catch (error => console.error(error))
