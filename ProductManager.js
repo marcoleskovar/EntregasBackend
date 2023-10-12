@@ -114,12 +114,16 @@ class ProductManager{
 
     deleteProduct = async (id) => {
         try{
-            this._products = await this.fileContent(this._path, this._format)
-            const productToDelete = this._products.filter(products => products.id !== id)
             const deletedProduct = this._products.find(products => products.id === id)
-            deletedProduct ? console.log(`\n===============PRODUCTO ELIMINADO===============\n`, deletedProduct) : console.error(`\ndeleteProduct: Not Found\n`)
-            await fs.promises.writeFile(this._path, JSON.stringify(productToDelete, null, 2))
-            return await this.getProducts()
+            if(deletedProduct){
+                this._products = await this.fileContent(this._path, this._format)
+                const productToDelete = this._products.filter(products => products.id !== id)
+                await fs.promises.writeFile(this._path, JSON.stringify(productToDelete, null, 2))
+                console.log(`\n===============PRODUCTO ELIMINADO===============\n`, deletedProduct)
+                return await this.getProducts()
+            }else{
+                console.error(`\ndeleteProduct: Not Found\n`)
+            }
         }
         catch (error){
             console.error('HA OCURRIDO UN ERROR EN "deleteProduct"', error)
@@ -164,6 +168,15 @@ const fourthProduct = {
     code: 'A4',
     stock: 21,
 }
+
+const fifthProduct = {
+    title: 'Producto 4',
+    description: 'Descripcion Producto 4',
+    price: 500,
+    thumbnail: './img/prod-1.webp',
+    code: 'A5',
+    stock: 21,
+}
     
 const run = async () => {
     await productManager.addProduct(firstProduct)
@@ -172,7 +185,7 @@ const run = async () => {
     await productManager.addProduct(fourthProduct)
     await productManager.getProductById(1)
     await productManager.updateProduct(2, {id: 'X', title: 'PRODUCTO POST-MODIFICACION', price: 40})
-    await productManager.deleteProduct(4)
+    await productManager.deleteProduct(3)
 }
     
 run()
