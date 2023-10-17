@@ -70,7 +70,7 @@ class ProductManager{
         try{
             if (fs.existsSync(this._path)){
                 this._products = await this.fileContent(this._path, this._format)
-                console.log(`\n===============LISTA DE PRODUCTOS===============\n`, this._products)
+                console.log(`\n===============LISTA DE PRODUCTOS===============\n`)
                 return this._products
             }else{
                 return fs.promises.writeFile(this._path, '[]', this._format)
@@ -169,25 +169,25 @@ const fourthProduct = {
     thumbnail: './img/prod-1.webp',
     code: 'A4',
     stock: 21,
-}  
+} 
 */
 
-/* 
+    
+/*
 const run = async () => {
      
     await productManager.addProduct(firstProduct)
     await productManager.addProduct(secondProduct)
     await productManager.addProduct(thirdProduct)
     await productManager.addProduct(fourthProduct)
-    //await productManager.getProductById(1)
-    //await productManager.updateProduct(2, {id: 'X', title: 'PRODUCTO POST-MODIFICACION', price: 40})
-    //await productManager.deleteProduct(3) 
+     await productManager.getProductById(1)
+    await productManager.updateProduct(2, {id: 'X', title: 'PRODUCTO POST-MODIFICACION', price: 40})
+    await productManager.deleteProduct(3) 
 
 }
 
     
 run()
-    .catch (error => console.error(error)) 
+    .catch (error => console.error(error))
 */
-
 export default ProductManager
