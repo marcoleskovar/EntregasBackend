@@ -70,7 +70,7 @@ class ProductManager{
         try{
             if (fs.existsSync(this._path)){
                 this._products = await this.fileContent(this._path, this._format)
-                console.log(`\n===============LISTA DE PRODUCTOS===============\n`)
+                console.log(`\n===============LISTA DE PRODUCTOS===============\n`, this._products)
                 return this._products
             }else{
                 return fs.promises.writeFile(this._path, '[]', this._format)
