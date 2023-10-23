@@ -180,9 +180,9 @@ const run = async () => {
     await productManager.addProduct(secondProduct)
     await productManager.addProduct(thirdProduct)
     await productManager.addProduct(fourthProduct)
-     await productManager.getProductById(1)
-    await productManager.updateProduct(2, {id: 'X', title: 'PRODUCTO POST-MODIFICACION', price: 40})
-    await productManager.deleteProduct(3) 
+    //await productManager.getProductById(1)
+    //await productManager.updateProduct(2, {id: 'X', title: 'PRODUCTO POST-MODIFICACION', price: 40})
+    //await productManager.deleteProduct(3) 
 
 }
 
