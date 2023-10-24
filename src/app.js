@@ -1,32 +1,16 @@
 import express from 'express'
-import ProductManager from "./ProductManager.js"
+import productsRouter from './router/router_products.js'
+//import cartRouter from './router/router_cart.js'
 
 const app = express()
-const productManager = new ProductManager()
+
+app.use(express.json())
+app.use(express.urlencoded({extended:true}))
+app.use(express.static('./public'))
 
 app.get('/', (req, res) => res.send('Pagina Principal'))
 
-app.get('/products', async (req, res) => {
-    const fileContent = await productManager.getProducts()
-
-    let limiteDeProductos = req.query.limit 
-
-    if (limiteDeProductos){
-        const limit = parseInt(limiteDeProductos)
-        if(!isNaN(limit)){
-            const productosLimitados = fileContent.slice(0, limit)
-            return res.json({productos: productosLimitados})
-        }
-    }
-
-    return res.json({data: fileContent})
-})
-
-app.get('/products/:pid', async (req, res) => {
-    const requestedId = parseInt(req.params.pid)
-    const productById = await productManager.getProductById(requestedId)
-    
-    return res.json ({producto: productById})
-})
+app.use('/api/products', productsRouter)
+//app.use('/api/carts', cartRouter)
 
 app.listen(8080, () => console.log('APP IS RUNNING'))

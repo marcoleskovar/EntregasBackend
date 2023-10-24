@@ -32,9 +32,22 @@ class ProductManager{
         }
     }
     
-    addProduct = async ({title, description, price, thumbnail, code, stock}) => {
+    addProduct = async ({title, description, price, thumbnail, code, category, stock, status}) => {
         try{
-            if (!title || !description || !price || !thumbnail || !code || !stock) return console.error(`\naddProduct: ${title} - incomplete\n`)
+            const newProduct = {
+                title,
+                description,
+                price,
+                thumbnail,
+                code,
+                category,
+                stock,
+                status
+            }
+
+            const excludedProperties = ['thumbnail']
+
+            if (Object.keys(newProduct).some(field => !newProduct[field] && !excludedProperties.includes(field))) return { success: false, status: 400, message: `addProduct: ${title} - incomplete` }      
     
             if (!fs.existsSync(this._path)){
                 await this.getProducts()
@@ -44,22 +57,18 @@ class ProductManager{
     
             this._products = await this.fileContent(this._path, this._format)
     
-            if (this._products.some(product => product.code === code)) return console.error(`The product "${title}" has the same code as another product("${code}")`)
+            if (this._products.some(product => product.code === code)) return {success: false, status: 400, message: `The product "${title}" has the same code as another product("${code}")`}
     
             this._products.push({
                 id: this._id,
-                title,
-                description,
-                price,
-                thumbnail,
-                code,
-                stock
+                ...newProduct
             })
     
             await fs.promises.writeFile(this._path, JSON.stringify(this._products, null, 2), this._format)
             console.log(`\nThe product "${title}" has been succesfully added:\n`)
     
-            return await this.getProducts()
+            await this.getProducts()
+            return {success: true, status: 200, message: 'Se agrego correctamente el producto'}
         }
         catch (error){
             return console.error('HA OCURRIDO UN ERROR EN "addProduct"', error)
