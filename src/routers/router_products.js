@@ -1,5 +1,5 @@
 import { Router } from "express"
-import ProductManager from '../ProductManager.js'
+import ProductManager from '../managers/ProductManager.js'
 
 const router = Router()
 const productManager = new ProductManager()
@@ -50,17 +50,47 @@ router.get('/:pid', async (req, res) => {
 
 router.post('/', async (req, res) => {
     try{
-        const productData = req.body
         const result = await productManager.addProduct(productData)
 
         if(result && result.success){
-            return res.status(result.status).json({success: result.message})
+            return res.status(200).json({success: result.message})
         }else{
             return res.status(result.status).json({error: result.message})
         }
     }
     catch(error){
-        console.log(error);
+        return res.status(500).json({error: error.message})
+    }
+})
+
+router.put('/:pid', async(req, res) => {
+    try{
+        const id = parseInt(req.params.pid)
+        const toUpdate = req.body
+        const result = await productManager.updateProduct(id, toUpdate)
+        if(result && result.success){
+            return res.status(200).json({success: result.message})
+        }else{
+            return res.status(result.status).json({error: result.message})
+        }
+    }
+    catch(error){
+        return res.status(500).json({error: error.message})
+    }
+})
+
+router.delete('/:pid', async(req, res) => {
+    try{
+        const id = parseInt(req.params.pid)
+        const result = await productManager.deleteProduct(id)
+        if(result && result.success){
+            return res.status(200).json({success: result.message})
+        }else{
+            return res.status(result.status).json({error: result.message})
+        }
+    }
+    catch(error){
+        return res.status(500).json({error: error.message})
     }
 })
 

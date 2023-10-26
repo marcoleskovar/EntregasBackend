@@ -4,7 +4,7 @@
     "title": "Producto 1",
     "description": "Descripcion Producto 1",
     "price": 1000,
-    "thumbnail": "./img/prod-1.webp",
+    "thumbnail": "../public/img/prod-1.webp",
     "code": "A1",
     "stock": 30
   },
@@ -13,7 +13,7 @@
     "title": "Producto 2",
     "description": "Descripcion Producto 2",
     "price": 200,
-    "thumbnail": "./img/prod-1.webp",
+    "thumbnail": "../public/img/prod-1.webp",
     "code": "A2",
     "stock": 4
   },
@@ -22,7 +22,7 @@
     "title": "Producto 3",
     "description": "Descripcion Producto 3",
     "price": 4000,
-    "thumbnail": "./img/prod-1.webp",
+    "thumbnail": "../public/img/prod-1.webp",
     "code": "A3",
     "stock": 39
   },
@@ -31,7 +31,7 @@
     "title": "Producto 4",
     "description": "Descripcion Producto 4",
     "price": 500,
-    "thumbnail": "./img/prod-1.webp",
+    "thumbnail": "../public/img/prod-1.webp",
     "code": "A4",
     "stock": 21
   }
