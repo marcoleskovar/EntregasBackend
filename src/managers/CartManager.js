@@ -1,5 +1,5 @@
-import fs from "fs"
-import ProductManager from "./ProductManager.js"
+import fs from 'fs'
+import ProductManager from './ProductManager.js'
 
 const productManager = new ProductManager()
 
@@ -18,7 +18,7 @@ class CartManager{
             return result
         }
         catch (error){
-            return console.error('HA OCURRIDO UN ERROR EN "CartContent', error)
+            return console.error('HA OCURRIDO UN ERROR EN CartContent', error)
         }
     }
 
@@ -31,7 +31,7 @@ class CartManager{
             return maxId
         }
         catch (error){
-            return console.error('HA OCURRIDO UN ERROR EN "lastId"', error)
+            return console.error('HA OCURRIDO UN ERROR EN lastId', error)
         }
     }
 

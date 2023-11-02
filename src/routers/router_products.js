@@ -1,4 +1,4 @@
-import { Router } from "express"
+import { Router } from 'express'
 import ProductManager from '../managers/ProductManager.js'
 
 const router = Router()
@@ -50,8 +50,8 @@ router.get('/:pid', async (req, res) => {
 
 router.post('/', async (req, res) => {
     try{
+        const productData = req.body
         const result = await productManager.addProduct(productData)
-
         if(result && result.success){
             return res.status(200).json({success: result.message})
         }else{

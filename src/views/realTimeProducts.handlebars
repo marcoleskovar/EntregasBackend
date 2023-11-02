@@ -1,0 +1,59 @@
+<section>
+        <h1>Agregar Producto</h1>
+        <form id="form">
+            <div>
+                <label for="title">Nombre:</label>
+                <input type="text" name="title" id="title" required/>
+            </div>
+            <div>
+                <label for="price">Precio:</label>
+                <input type="number" name="price" id="price" required/>
+            </div>
+            <div>
+                <label for="category">Categoria:</label>
+                <select name="category" id="category" required>
+                        <option value="Zapatillas">Zapatillas</option>
+                        <option value="Remeras">Remeras</option>
+                        <option value="Camperas">Camperas</option>
+                        <option value="Buzos">Buzos</option>
+                </select>
+            </div>
+            <div>
+                <label for="stock">Stock:</label>
+                <input type="number" name="stock" id="stock" required/>
+            </div>
+            <div>
+                <label for="description">Descripcion:</label>
+                <input type="text" name="description" id="description" required/>
+            </div>
+            <div>
+                <label for="code">Codigo:</label>
+                <input type="text" name="code" id="code" required/>
+            </div>
+            <div>
+                <label for="status">Status:</label>
+                <select name="category" id="status" required>
+                        <option value="true" selected>true</option>
+                        <option value="false">false</option>
+                </select>
+            </div>
+            <button id="agregar">Agregar Producto</button>
+        </form>
+</section>
+    <hr>
+<section>
+    {{#each products}}
+        <div>
+            <h2>{{this.title}}</h2>
+            <h5>Id: {{this.id}}</h5>
+            <h5>Precio: {{this.price}}</h5>
+            <h5>Category: {{this.category}}</h5>
+            <h5>Stock: {{this.stock}}</h5>
+            <h5>descripcion: {{this.description}}</h5>
+            <h5>Code: {{this.code}}</h5>
+        </div>
+    {{/each}}
+</section>
+
+<script src="../public/index.js"></script>
+<script src="/socket.io/socket.io.js"></script>
