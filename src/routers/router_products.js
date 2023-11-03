@@ -25,7 +25,8 @@ router.get('/', async (req, res) => {
         return res.status(200).json({data: fileContent})
     }
     catch(error){
-        return res.status(500).json({error: error.message})
+        console.log({succes: result.success,status: result.status, error: result.message});
+        return res.status(500).json({succes: result.success,status: result.status, error: result.message})
     }
 })
 
@@ -36,7 +37,7 @@ router.get('/:pid', async (req, res) => {
         if (!isNaN(requestedId) && requestedId > 0){
             if(requestedId > fileContent.length) return res.status(404).json({error: 'ID not found'})
             const productById = await productManager.getProductById(requestedId)
-        
+
             return res.json ({producto: productById})
         }else{
             if(requestedId <= 0) return res.status(400).json({error: 'ID has to be above 0'})
@@ -44,7 +45,8 @@ router.get('/:pid', async (req, res) => {
         }
     }
     catch(error){
-        return res.status(500).json({error: error.message})
+        console.log({succes: result.success,status: result.status, error: result.message});
+        return res.status(500).json({succes: result.success,status: result.status, error: result.message})
     }
 })
 
@@ -53,13 +55,16 @@ router.post('/', async (req, res) => {
         const productData = req.body
         const result = await productManager.addProduct(productData)
         if(result && result.success){
-            return res.status(200).json({success: result.message})
+            console.log({status: result.status, success: result.message});
+            return res.status(200).json({status: result.status, success: result.message})
         }else{
-            return res.status(result.status).json({error: result.message})
+            console.log({succes: result.success,status: result.status, error: result.message});
+            return res.status(result.status).json({succes: result.success,status: result.status, error: result.message})
         }
     }
     catch(error){
-        return res.status(500).json({error: error.message})
+        console.log({succes: result.success,status: result.status, error: result.message});
+        return res.status(500).json({succes: result.success,status: result.status, error: result.message})
     }
 })
 
@@ -69,13 +74,16 @@ router.put('/:pid', async(req, res) => {
         const toUpdate = req.body
         const result = await productManager.updateProduct(id, toUpdate)
         if(result && result.success){
-            return res.status(200).json({success: result.message})
+            console.log({status: result.status, success: result.message});
+            return res.status(200).json({status: result.status, success: result.message})
         }else{
-            return res.status(result.status).json({error: result.message})
+            console.log({succes: result.success,status: result.status, error: result.message});
+            return res.status(result.status).json({succes: result.success,status: result.status, error: result.message})
         }
     }
     catch(error){
-        return res.status(500).json({error: error.message})
+        console.log({succes: result.success,status: result.status, error: result.message});
+        return res.status(500).json({succes: result.success,status: result.status, error: result.message})
     }
 })
 
@@ -84,13 +92,16 @@ router.delete('/:pid', async(req, res) => {
         const id = parseInt(req.params.pid)
         const result = await productManager.deleteProduct(id)
         if(result && result.success){
-            return res.status(200).json({success: result.message})
+            console.log({status: result.status, success: result.message})
+            return res.status(200).json({status: result.status, success: result.message})
         }else{
-            return res.status(result.status).json({error: result.message})
+            console.log({succes: result.success,status: result.status, error: result.message});
+            return res.status(result.status).json({succes: result.success,status: result.status, error: result.message})
         }
     }
     catch(error){
-        return res.status(500).json({error: error.message})
+        console.log({succes: result.success,status: result.status, error: result.message});
+        return res.status(500).json({succes: result.success,status: result.status, error: result.message})
     }
 })
 

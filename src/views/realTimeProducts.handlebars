@@ -32,7 +32,7 @@
             </div>
             <div>
                 <label for="status">Status:</label>
-                <select name="category" id="status" required>
+                <select name="status" id="status" required>
                         <option value="true" selected>true</option>
                         <option value="false">false</option>
                 </select>
@@ -42,7 +42,7 @@
 </section>
     <hr>
 <section>
-    {{#each products}}
+    {{!-- {{#each list}}
         <div>
             <h2>{{this.title}}</h2>
             <h5>Id: {{this.id}}</h5>
@@ -52,8 +52,9 @@
             <h5>descripcion: {{this.description}}</h5>
             <h5>Code: {{this.code}}</h5>
         </div>
-    {{/each}}
+    {{/each}} --}}
 </section>
+<section id="productList"></section>
 
-<script src="../public/index.js"></script>
 <script src="/socket.io/socket.io.js"></script>
+<script src="static/js/index.js"></script>
