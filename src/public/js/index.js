@@ -3,7 +3,7 @@ const add = document.getElementById('agregar')
 const socket = io()
 
 add.onclick = async (e) => {
-    e.preventDefault();
+    e.preventDefault()
     const titleIs = document.getElementById('title').value
     const priceIs = document.getElementById('price').value
     const categoryIs = document.getElementById('category').value
@@ -35,33 +35,46 @@ add.onclick = async (e) => {
         socket.emit('newList', list.data)
 }
 
+const deleteProduct = async (id) => {
+    try{
+        await fetch(`/api/products/${id}`, {
+            method: 'DELETE'
+        })
+        const products = await fetch ('/api/products')
+        const result = await products.json()
+        socket.emit('newList', result.data)
+    }
+    catch(error){
+        console.log(error)
+    }
+}
+
 socket.on('all', async list => {
     const container = document.getElementById('productList')
     container.innerHTML = ''
 
     list.forEach(element => {
         const productDiv = document.createElement('div')
+        const separation = document.createElement('hr')
+        const deleteBtn = document.createElement('button')
+        
+        const productFields = Object.keys(element)
+        productFields.forEach(field => {
+            const elementTag = field === 'title' ? 'h1' : field === 'price' ? 'h2' : 'h4'
+            const newElement = document.createElement(elementTag)
+            newElement.textContent = element[field]
+            productDiv.appendChild(newElement)
+        })
 
-        const title = document.createElement('h2')
-        title.textContent = element.title
-        const price = document.createElement('h4')
-        price.textContent = element.price
-        const category = document.createElement('h4')
-        category.textContent = element.category
-        const stock = document.createElement('h4')
-        stock.textContent = element.stock
-        const description = document.createElement('h4')
-        description.textContent = element.description
-        const status = document.createElement('h4')
-        status.textContent = element.status
+        deleteBtn.textContent = 'Eliminar'
+        deleteBtn.onclick = () => deleteProduct(element.id)
 
-        productDiv.appendChild(title)
-        productDiv.appendChild(price)
-        productDiv.appendChild(category)
-        productDiv.appendChild(stock)
-        productDiv.appendChild(description)
-        productDiv.appendChild(status)
+        container.appendChild(productDiv)
+        container.appendChild(deleteBtn)
+        container.appendChild(separation)
+    })
+})
 
-        container.appendChild(productDiv);
-    });
-});
+socket.on('PostDeleteList', async nepe => {
+
+})

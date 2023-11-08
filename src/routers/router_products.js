@@ -60,7 +60,7 @@ router.post('/', async (req, res) => {
         }else{
             console.log({succes: result.success,status: result.status, error: result.message});
             return res.status(result.status).json({succes: result.success,status: result.status, error: result.message})
-        }
+        }   
     }
     catch(error){
         console.log({succes: result.success,status: result.status, error: result.message});
