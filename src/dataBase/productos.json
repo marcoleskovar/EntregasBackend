@@ -34,5 +34,15 @@
     "thumbnail": "../public/img/prod-1.webp",
     "code": "A4",
     "stock": 21
+  },
+  {
+    "id": 5,
+    "title": "NUEVO PROD",
+    "description": "CAMPERA DE ALGODON EXCELENTE ESTADO",
+    "price": "78000",
+    "code": "A89",
+    "category": "Camperas",
+    "stock": "12",
+    "status": "false"
   }
 ]

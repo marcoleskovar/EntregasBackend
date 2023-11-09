@@ -37,12 +37,11 @@ add.onclick = async (e) => {
 
 const deleteProduct = async (id) => {
     try{
-        await fetch(`/api/products/${id}`, {
+        const fetchFunc = await fetch(`/api/products/${id}`, {
             method: 'DELETE'
         })
-        const products = await fetch ('/api/products')
-        const result = await products.json()
-        socket.emit('newList', result.data)
+        const result = await fetchFunc.json()
+        console.log(result);
     }
     catch(error){
         console.log(error)
@@ -60,21 +59,28 @@ socket.on('all', async list => {
         
         const productFields = Object.keys(element)
         productFields.forEach(field => {
-            const elementTag = field === 'title' ? 'h1' : field === 'price' ? 'h2' : 'h4'
-            const newElement = document.createElement(elementTag)
-            newElement.textContent = element[field]
-            productDiv.appendChild(newElement)
+            if(field !=='id'){
+                const labelElement = document.createElement('span')
+                const valueElement = document.createElement('span')
+    
+                labelElement.textContent = `${field}: `
+                valueElement.textContent = element[field]
+                
+                const elementTag = field === 'title' ? 'h2' : 'h5'
+                const newElement = document.createElement(elementTag)
+                newElement.appendChild(labelElement)
+                newElement.appendChild(valueElement)
+                productDiv.appendChild(newElement)
+            }
         })
 
         deleteBtn.textContent = 'Eliminar'
-        deleteBtn.onclick = () => deleteProduct(element.id)
+        deleteBtn.onclick = function (){
+            deleteProduct(element.id)
+        }
 
         container.appendChild(productDiv)
         container.appendChild(deleteBtn)
         container.appendChild(separation)
     })
-})
-
-socket.on('PostDeleteList', async nepe => {
-
 })

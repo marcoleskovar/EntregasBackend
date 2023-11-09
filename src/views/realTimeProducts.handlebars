@@ -41,20 +41,19 @@
         </form>
 </section>
     <hr>
-<section>
-    {{!-- {{#each list}}
+<section id="productList">
+    {{#each list}}
         <div>
-            <h2>{{this.title}}</h2>
-            <h5>Id: {{this.id}}</h5>
-            <h5>Precio: {{this.price}}</h5>
+            <h2>title: {{this.title}}</h2>
+            <h5>description: {{this.description}}</h5>
+            <h5>price: {{this.price}}</h5>
+            <h5>thumbnail: {{this.thumbnail}}</h5>
             <h5>Category: {{this.category}}</h5>
-            <h5>Stock: {{this.stock}}</h5>
-            <h5>descripcion: {{this.description}}</h5>
             <h5>Code: {{this.code}}</h5>
+            <h5>Stock: {{this.stock}}</h5>
         </div>
-    {{/each}} --}}
+    {{/each}}
 </section>
-<section id="productList"></section>
 
 <script src="/socket.io/socket.io.js"></script>
 <script src="static/js/index.js"></script>

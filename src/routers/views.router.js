@@ -20,6 +20,7 @@ router.get('/', async (req, res) => {
 router.get('/realTimeProducts', async (req, res) => {
     try{
         const list = await productManager.getProducts()//NOT
+        console.log(list);
         res.render('realTimeProducts', {list})//NOT
     }
     catch(error){
