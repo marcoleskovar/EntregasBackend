@@ -19,9 +19,8 @@ router.get('/', async (req, res) => {
 
 router.get('/realTimeProducts', async (req, res) => {
     try{
-        const list = await productManager.getProducts()//NOT
-        console.log(list);
-        res.render('realTimeProducts', {list})//NOT
+        const list = await productManager.getProducts()
+        res.render('realTimeProducts', {list})
     }
     catch(error){
         return res.status(500).json({error: error.message})
