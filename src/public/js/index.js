@@ -32,41 +32,42 @@ add.onclick = async (e) => {
 
         const products = await fetch ('/api/products')
         const list = await products.json()
-        socket.emit('newList', list.data)
+        socket.emit('newList', list.productos.reverse())
 }
 
 const deleteProduct = async (id) => {
     try{
-        const fetchFunc = await fetch(`/api/products/${id}`, {
+        await fetch(`/api/products/${id}`, {
             method: 'DELETE'
         })
-        const result = await fetchFunc.json()
-        console.log(result);
+        const products = await fetch ('/api/products')
+        const result = await products.json()
+        socket.emit('newList', result.productos.reverse())
     }
     catch(error){
         console.log(error)
     }
 }
 
-socket.on('all', async list => {
+socket.on('updatedProducts', async products => {
     const container = document.getElementById('productList')
     container.innerHTML = ''
 
-    list.forEach(element => {
+    products.forEach(element => {
         const productDiv = document.createElement('div')
         const separation = document.createElement('hr')
         const deleteBtn = document.createElement('button')
         
         const productFields = Object.keys(element)
         productFields.forEach(field => {
-            if(field !=='id'){
+            if(field !=='_id'){
                 const labelElement = document.createElement('span')
                 const valueElement = document.createElement('span')
     
                 labelElement.textContent = `${field}: `
                 valueElement.textContent = element[field]
                 
-                const elementTag = field === 'title' ? 'h2' : 'h5'
+                const elementTag = field === 'title' ? 'h2' : 'h4'
                 const newElement = document.createElement(elementTag)
                 newElement.appendChild(labelElement)
                 newElement.appendChild(valueElement)
@@ -76,7 +77,7 @@ socket.on('all', async list => {
 
         deleteBtn.textContent = 'Eliminar'
         deleteBtn.onclick = function (){
-            deleteProduct(element.id)
+            deleteProduct(element._id)
         }
 
         container.appendChild(productDiv)

@@ -1,32 +1,51 @@
+//IMPORT TOOLS
 import express from 'express'
-import { Server } from 'socket.io'
+import mongoose from 'mongoose'
 import handlebars from 'express-handlebars'
 import __dirname from './utils.js'
+import { Server } from 'socket.io'
 
-import productsRouter from './routers/router_products.js'
-import cartRouter from './routers/router_cart.js'
+//IMPORT ROUTERS
 import viewsRouter from './routers/views.router.js'
+import productsRouter from './routers/router.products.js'
+/* import cartRouter from './routers/router_cart.js' */
 
+//DEFINING CONSTANTS
 const app = express()
+const mongoURL = 'mongodb+srv://marcoMONGO:boxitraci0MONGO@ecommerce.djq8g7q.mongodb.net/'
+const mongoName = 'ecommerce'
 
-app.use(express.json())
-app.use(express.urlencoded({extended:true}))
-app.use('/static', express.static(__dirname + '/public'))
-app.use('/api/products', productsRouter)
-app.use('/api/carts', cartRouter)
-app.use('/', viewsRouter)
-
-app.engine('handlebars', handlebars.engine())
+//CONFIG ENGINE
+app.engine('hbs', handlebars.engine())
 app.set('views', __dirname + '/views')
-app.set('view engine', 'handlebars')
+app.set('view engine', 'hbs')
 
-const httpServer = app.listen(8080, () => console.log('APP IS RUNNING'))
-const socketServer = new Server(httpServer)
+//USE JSON
+app.use(express.json())
+app.use(express.urlencoded({extended: true}))
 
-socketServer.on('connection', socket => {
-    console.log('Nuevo cliente conectado')
-    
-    socket.on('newList', async list => {
-        socket.emit('all', list)
+//STATIC
+app.use('/static', express.static(__dirname + '/public'))
+
+//ROUTERS
+app.use('/', viewsRouter)
+app.use('/api/products', productsRouter)
+/* app.use('/api/carts', cartRouter) */
+
+//LISTEN
+mongoose.connect(mongoURL, {dbName: mongoName})
+    .then(() => {
+        //TO CHECK socket
+        console.log('DB CONNECTED')
+        const PORT = process.env.PORT || 8080
+        const httpServer = app.listen(PORT, () => console.log('RUNNING...'))
+        const io = new Server(httpServer)
+        io.on('connection', socket => {
+            console.log('Nuevo cliente conectado')
+            
+            socket.on('newList', async products => {
+                socket.emit('updatedProducts', products)
+            })
+        })
     })
-})
+    .catch(e => console.log(e))
