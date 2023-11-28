@@ -7,6 +7,7 @@ import { Server } from 'socket.io'
 
 //IMPORT ROUTERS
 import viewsRouter from './routers/views.router.js'
+import chatRouter from './routers/chat.router.js'
 import productsRouter from './routers/router.products.js'
 /* import cartRouter from './routers/router_cart.js' */
 
@@ -29,6 +30,7 @@ app.use('/static', express.static(__dirname + '/public'))
 
 //ROUTERS
 app.use('/', viewsRouter)
+app.use('/chat', chatRouter)
 app.use('/api/products', productsRouter)
 /* app.use('/api/carts', cartRouter) */
 
@@ -45,6 +47,9 @@ mongoose.connect(mongoURL, {dbName: mongoName})
             
             socket.on('newList', async products => {
                 socket.emit('updatedProducts', products)
+            })
+            socket.on('message', async data => {
+                socket.emit('chat', data)
             })
         })
     })

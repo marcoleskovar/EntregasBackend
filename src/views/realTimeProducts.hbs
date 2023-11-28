@@ -38,7 +38,7 @@
                 <option value="false">false</option>
             </select>
         </div>
-            <button id="agregar">Agregar Producto</button>
+            <button id="agregar" type="submit">Agregar Producto</button>
     </form>
 </section>
     <hr>
@@ -48,12 +48,10 @@
             <h2>title: {{this.title}}</h2>
             <h4>description: {{this.description}}</h4>
             <h4>price: {{this.price}}</h4>
-            <h4>thumbnail: {{this.thumbnail}}</h4>
             <h4>code: {{this.code}}</h4>
             <h4>category: {{this.category}}</h4>
             <h4>stock: {{this.stock}}</h4>
             <h4>status: {{this.status}}</h4>
-            <h4>__v: {{this.__v}}</h4>
             <button onclick="deleteProduct('{{this._id}}')">Eliminar</button>
         </div>
         <hr>

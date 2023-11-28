@@ -1,38 +1,46 @@
-const formIs = document.getElementById('form')
-const add = document.getElementById('agregar')
 const socket = io()
 
-add.onclick = async (e) => {
+const formIs = document.getElementById('form')
+const titleIs = document.getElementById('title')
+const priceIs = document.getElementById('price')
+const categoryIs = document.getElementById('category')
+const stockIs = document.getElementById('stock')
+const descriptionIs = document.getElementById('description')
+const codeIs = document.getElementById('code')
+const statusIs = document.getElementById('status')
+
+formIs.onsubmit = async (e) => {
     e.preventDefault()
-    const titleIs = document.getElementById('title').value
-    const priceIs = document.getElementById('price').value
-    const categoryIs = document.getElementById('category').value
-    const stockIs = document.getElementById('stock').value
-    const descriptionIs = document.getElementById('description').value
-    const codeIs = document.getElementById('code').value
-    const statusIs = document.getElementById('status').value
 
     const product = {
-        title: titleIs,
-        description: descriptionIs,
-        price: priceIs,
-        code: codeIs,
-        category: categoryIs,
-        stock: stockIs,
-        status: statusIs
+        title: titleIs.value,
+        description: descriptionIs.value,
+        price: priceIs.value,
+        code: codeIs.value,
+        category: categoryIs.value,
+        stock: stockIs.value,
+        status: statusIs.value
     }
 
-        await fetch('/api/products', {
-            method: 'POST',
-            body: JSON.stringify(product),
-            headers: {
-                'Content-Type': 'application/json',
-            }
-        })
+    sendProduct(product)
+}
 
+const sendProduct = async (product) => {
+    const fetchProd = await fetch('/api/products', {
+        method: 'POST',
+        body: JSON.stringify(product),
+        headers: {
+            'Content-Type': 'application/json',
+        }
+    })
+
+    if (fetchProd.status !== 500){
         const products = await fetch ('/api/products')
         const list = await products.json()
-        socket.emit('newList', list.productos.reverse())
+        formIs.reset()
+        return socket.emit('newList', list.productos.reverse())
+    }
+    codeIs.value = ''
 }
 
 const deleteProduct = async (id) => {
@@ -60,7 +68,7 @@ socket.on('updatedProducts', async products => {
         
         const productFields = Object.keys(element)
         productFields.forEach(field => {
-            if(field !=='_id'){
+            if(field !==('_id') && field !==('__v') && field !== ('thumbnail')){
                 const labelElement = document.createElement('span')
                 const valueElement = document.createElement('span')
     
