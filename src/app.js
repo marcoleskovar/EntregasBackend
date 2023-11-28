@@ -9,7 +9,7 @@ import { Server } from 'socket.io'
 import viewsRouter from './routers/views.router.js'
 import chatRouter from './routers/chat.router.js'
 import productsRouter from './routers/router.products.js'
-/* import cartRouter from './routers/router_cart.js' */
+import cartRouter from './routers/router.cart.js'
 
 //DEFINING CONSTANTS
 const app = express()
@@ -32,7 +32,7 @@ app.use('/static', express.static(__dirname + '/public'))
 app.use('/', viewsRouter)
 app.use('/chat', chatRouter)
 app.use('/api/products', productsRouter)
-/* app.use('/api/carts', cartRouter) */
+app.use('/api/carts', cartRouter)
 
 //LISTEN
 mongoose.connect(mongoURL, {dbName: mongoName})
