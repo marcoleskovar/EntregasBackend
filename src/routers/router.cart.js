@@ -94,22 +94,32 @@ router.put('/:cid', async(req, res) => {
     }
 })
 
-/* router.put('/:cid/products/:pid', async(req, res) => {
+router.put('/:cid/products/:pid', async(req, res) => {
     try{
-        const id = req.params.cid
-        const toUpdate = req.body.products
-        const toObjectId = new mongoose.Types.ObjectId(id)
-        const findInCart = await CartModel.findById(toObjectId)
+        const cid = req.params.cid
+        const pid = req.params.pid
+        const toUpdate = req.body.quantity
+        const toObjectCid = new mongoose.Types.ObjectId(cid)
+        const toObjectPid = new mongoose.Types.ObjectId(pid)
+        const findInCart = await CartModel.findById(toObjectCid)
 
         if(!findInCart) return res.status(404).json({success: false, message: 'CartID not found'})
-        if (!Array.isArray(toUpdate)) return res.status(400).json({success: false, message: 'The product is not valid' })
-        findInCart.products = toUpdate
-        
+
+        const foundInProducts = findInCart.products.findIndex((item) => item.product.equals(toObjectPid))
+
+        if (foundInProducts === -1) return res.status(400).json({success: false, message: 'The product is not valid' })
+
+        if (!Number.isInteger(toUpdate) || toUpdate < 0) {
+            return res.status(400).json({ status: error, message: 'Quantity must be a positive number' })
+        }
+
+        findInCart.products[foundInProducts].quantity = toUpdate
+
         const result = await findInCart.save()
 
         if(result){
-            const prodNew = await CartModel.findById(toObjectId).lean().exec()
-            return res.status(200).json({success: true, message: 'Se ha modificado correctamente el producto', before: toObjectId, after: prodNew})
+            const prodNew = await CartModel.findById(toObjectCid).lean().exec()
+            return res.status(200).json({success: true, message: 'Se ha modificado correctamente el producto', before: toObjectCid, after: prodNew})
         }else{
             return res.status(500).json({success: false, message: 'No se ha modificado correctamente el producto'})
         }
@@ -117,7 +127,7 @@ router.put('/:cid', async(req, res) => {
     catch(e){
         return res.status(500).json({success: false, error: e.message, detail: e})
     }
-}) */
+})
 
 router.delete('/:cid', async (req, res) => {
     try{
