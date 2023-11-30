@@ -10,8 +10,7 @@ router.get('/:cid', async (req, res) => {
         const id = req.params.cid
         if(id <= 0) return res.status(400).json({success: false, error: 'ID has to be above 0'})
 
-        const toObjectId = new mongoose.Types.ObjectId(id)
-        const productById = await CartModel.findById(toObjectId).lean().exec()
+        const productById = await CartModel.findOne({_id: id})
         if (productById === null) return res.status(404).json({success: false, error: 'ID not found'})
 
         return res.status(200).json({success: true, producto: productById})
@@ -42,20 +41,21 @@ router.post('/:cid/products/:pid', async (req, res) => {
         const pid = req.params.pid
         const cidToObjectId = new mongoose.Types.ObjectId(cid)
         const pidToObjectId = new mongoose.Types.ObjectId(pid)
-        const foundInProducts = await ProductModel.findById(pidToObjectId)
+       const foundInProducts = await ProductModel.findById(pidToObjectId)
         const foundInCart = await CartModel.findById(cidToObjectId)
+
         if (!foundInProducts) return res.status(404).json({success: false, error: 'ProductID not found'})
         if (!foundInCart) return res.status(404).json({success: false, error: 'CartID not found'})
         
-        const producto = foundInCart.products.find(p => p.product.toString() === pid)
-        if(!producto){
+        const producto = foundInCart.products.findIndex(p => p.product.equals(pidToObjectId))
+        if(producto === -1){
             const newProduct = {
-                product: pid,
+                product: pidToObjectId,
                 quantity: 1,
             }
             foundInCart.products.push(newProduct)
         }else{
-            producto.quantity++
+            foundInCart.products[producto].quantity++
         }
         const result = await foundInCart.save()
         if(result){
