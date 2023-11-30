@@ -36,7 +36,7 @@ router.post('/', async (req, res) => {
     }
 })
 
-router.post('/:cid/product/:pid', async (req, res) => {
+router.post('/:cid/products/:pid', async (req, res) => {
     try{
         const cid = req.params.cid
         const pid = req.params.pid
@@ -62,6 +62,96 @@ router.post('/:cid/product/:pid', async (req, res) => {
             return res.status(200).json({succes: true,  message: 'Se ha agregado correctamente el producto al carrito'})
         }else{
             return res.status(500).json({succes: false, error: 'No se ha agregado correctamente el producto al carrito'})
+        }
+    }
+    catch(e){
+        return res.status(500).json({success: false, error: e.message, detail: e})
+    }
+})
+
+router.put('/:cid', async(req, res) => {
+    try{
+        const id = req.params.cid
+        const toUpdate = req.body.products
+        const toObjectId = new mongoose.Types.ObjectId(id)
+        const findInCart = await CartModel.findById(toObjectId)
+
+        if(!findInCart) return res.status(404).json({success: false, message: 'CartID not found'})
+        if (!Array.isArray(toUpdate)) return res.status(400).json({success: false, message: 'The product is not valid' })
+        findInCart.products = toUpdate
+        
+        const result = await findInCart.save()
+
+        if(result){
+            const prodNew = await CartModel.findById(toObjectId).lean().exec()
+            return res.status(200).json({success: true, message: 'Se ha modificado correctamente el producto', before: toObjectId, after: prodNew})
+        }else{
+            return res.status(500).json({success: false, message: 'No se ha modificado correctamente el producto'})
+        }
+    }
+    catch(e){
+        return res.status(500).json({success: false, error: e.message, detail: e})
+    }
+})
+
+/* router.put('/:cid/products/:pid', async(req, res) => {
+    try{
+        const id = req.params.cid
+        const toUpdate = req.body.products
+        const toObjectId = new mongoose.Types.ObjectId(id)
+        const findInCart = await CartModel.findById(toObjectId)
+
+        if(!findInCart) return res.status(404).json({success: false, message: 'CartID not found'})
+        if (!Array.isArray(toUpdate)) return res.status(400).json({success: false, message: 'The product is not valid' })
+        findInCart.products = toUpdate
+        
+        const result = await findInCart.save()
+
+        if(result){
+            const prodNew = await CartModel.findById(toObjectId).lean().exec()
+            return res.status(200).json({success: true, message: 'Se ha modificado correctamente el producto', before: toObjectId, after: prodNew})
+        }else{
+            return res.status(500).json({success: false, message: 'No se ha modificado correctamente el producto'})
+        }
+    }
+    catch(e){
+        return res.status(500).json({success: false, error: e.message, detail: e})
+    }
+}) */
+
+router.delete('/:cid', async (req, res) => {
+    try{
+        const cid = req.params.cid
+        const cidToObjectId = new mongoose.Types.ObjectId(cid)
+        const foundInCart = await CartModel.findByIdAndDelete(cidToObjectId)
+        if(foundInCart){
+            return res.status(200).json({succes: true,  message: 'Se ha eliminado correctamente el carrito'})
+        }else{
+            return res.status(404).json({success: false, error: 'CartID not found'})
+        }
+    }
+    catch(e){
+        return res.status(500).json({success: false, error: e.message, detail: e})
+    }
+})
+
+router.delete('/:cid/products/:pid', async (req, res) => {
+    try{
+        const cid = req.params.cid
+        const pid = req.params.pid
+        const cidToObjectId = new mongoose.Types.ObjectId(cid)
+        const pidToObjectId = new mongoose.Types.ObjectId(pid)
+        const foundInCart = await CartModel.findById(cidToObjectId)
+        const foundInProducts = foundInCart.products.findIndex((item) => item.product.equals(pidToObjectId))
+        if (!foundInCart) return res.status(404).json({success: false, error: 'CartID not found'})
+        if (foundInProducts === -1) return res.status(404).json({success: false, error: 'ProductID not found'})
+
+        foundInCart.products.splice(foundInProducts, 1)
+        const result = await foundInCart.save()
+        if(result){
+            return res.status(200).json({succes: true,  message: 'Se ha eliminado correctamente el producto al carrito', payload: result})
+        }else{
+            return res.status(500).json({succes: false, error: 'No se ha eliminado correctamente el producto al carrito'})
         }
     }
     catch(e){
