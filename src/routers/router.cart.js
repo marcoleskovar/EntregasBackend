@@ -5,6 +5,16 @@ import ProductModel from '../dao/models/products.model.js'
 
 const router = Router()
 
+router.get('/', async (req, res) => {
+    try{
+        const cart = await CartModel.find().lean().exec()
+        if(cart) return res.status(200).json({success: true, cart: cart})
+    }
+    catch(e){
+        return res.status(500).json({success: false, error: e.message, detail: e})
+    }
+})
+
 router.get('/:cid', async (req, res) => {
     try{
         const id = req.params.cid

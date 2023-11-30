@@ -23,7 +23,10 @@
             <h4>descripcion: {{this.description}}</h4>
             <h4>Code: {{this.code}}</h4>
         </div>
-        <button id="addToCart">Agregar Al carrito</button>
+        <button class="addToCart" data-product-id='{{this._id}}'>Agregar Al carrito</button>
         <hr>
     {{/each}}
 </section>
+
+<script src="/socket.io/socket.io.js"></script>
+<script src="static/js/cart.js"></script>
