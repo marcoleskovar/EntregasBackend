@@ -46,7 +46,7 @@ mongoose.connect(mongoURL, {dbName: mongoName})
             console.log('Nuevo cliente conectado')
             
             socket.on('newList', async products => {
-                socket.emit('updatedProducts', products)
+                io.emit('updatedProducts', products)
             })
             socket.on('message', async data => {
                 socket.emit('chat', data)

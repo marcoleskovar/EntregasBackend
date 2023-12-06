@@ -42,8 +42,21 @@
     </form>
 </section>
     <hr>
+    <section>
+        <ul>
+            <li>Total Docs: {{totalDocs}}</li>
+            <li>Total Pages: {{totalPages}}</li>
+            {{#if hasPrevPage }}
+                <li><a href="/realTimeProducts/?page={{prevPage}}&limit={{limit}}&sort={{sort}}">Previous</a></li>
+            {{/if}}
+            {{#if hasNextPage }}
+                <li><a href="/realTimeProducts/?page={{nextPage}}&limit={{limit}}&sort={{sort}}">Next</a></li>
+            {{/if}}
+        </ul>
+    </section>
+    <hr>
 <section id="productList">
-    {{#each productList}}
+    {{#each docs}}
         <div>
             <h2>title: {{this.title}}</h2>
             <h4>description: {{this.description}}</h4>
@@ -59,4 +72,4 @@
 </section>
 
 <script src="/socket.io/socket.io.js"></script>
-<script src="static/js/index.js"></script>
+<script src="/static/js/index.js"></script>
