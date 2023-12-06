@@ -21,8 +21,13 @@ const queryParams = async (req) => {
     return result
 }
 
+const auth = (req, res, next) => {
+    if(req.session?.user) return next()
+    res.redirect('/session/login')
+}
 
-router.get('/', async (req, res) => {
+
+router.get('/', auth, async (req, res) => {
     try{
         const result = await queryParams(req)
         const prevPage = result.prevPage
@@ -49,7 +54,7 @@ router.get('/', async (req, res) => {
     }
 })
 
-router.get('/products', async (req, res) => {
+router.get('/products', auth, async (req, res) => {
     try{
         const result = await queryParams(req)
         res.render('products', result)
@@ -59,7 +64,7 @@ router.get('/products', async (req, res) => {
     }
 })
 
-router.get('/realTimeProducts', async (req, res) => {
+router.get('/realTimeProducts', auth, async (req, res) => {
     try{
         const result = await queryParams(req)
         res.render('realTimeProducts', result)
