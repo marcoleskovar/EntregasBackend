@@ -4,17 +4,31 @@ import mongoose from 'mongoose'
 import handlebars from 'express-handlebars'
 import __dirname from './utils.js'
 import { Server } from 'socket.io'
+import session from 'express-session'
+import MongoStore from 'connect-mongo'
 
 //IMPORT ROUTERS
 import viewsRouter from './routers/views.router.js'
 import chatRouter from './routers/chat.router.js'
 import productsRouter from './routers/router.products.js'
 import cartRouter from './routers/router.cart.js'
+import sessionRouter from './routers/session.router.js'
 
 //DEFINING CONSTANTS
 const app = express()
 const mongoURL = 'mongodb+srv://marcoMONGO:boxitraci0MONGO@ecommerce.djq8g7q.mongodb.net/'
 const mongoName = 'ecommerce'
+
+//CREATING SESSION
+app.use(session({
+    store: MongoStore.create({
+        mongoUrl: mongoURL,
+        dbName: mongoName
+    }),
+    secret: 'secret',
+    resave: true,
+    saveUninitialized: true
+}))
 
 //CONFIG ENGINE
 app.engine('hbs', handlebars.engine())
@@ -33,12 +47,16 @@ app.use('/', viewsRouter)
 app.use('/chat', chatRouter)
 app.use('/api/products', productsRouter)
 app.use('/api/carts', cartRouter)
+app.use('/session', sessionRouter)
 
 //LISTEN
 mongoose.connect(mongoURL, {dbName: mongoName})
     .then(() => {
         //TO CHECK socket
         console.log('DB CONNECTED')
+    })
+    .catch(e => console.log(e))
+    .finally(() => {
         const PORT = process.env.PORT || 8080
         const httpServer = app.listen(PORT, () => console.log('RUNNING...'))
         const io = new Server(httpServer)
@@ -53,4 +71,3 @@ mongoose.connect(mongoURL, {dbName: mongoName})
             })
         })
     })
-    .catch(e => console.log(e))
