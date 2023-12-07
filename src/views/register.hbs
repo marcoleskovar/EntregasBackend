@@ -1,7 +1,7 @@
 <h1>REGISTRATE</h1>
 <hr>
 <section>
-    <form action="">
+    <form action="/session/register" method="POST">
         <label for="name">Name: </label><input type="text" name="name" required>
         <br>
         <label for="lastname">Lastname: </label><input type="text" name="lastname" required>
@@ -14,7 +14,8 @@
         <br>
         <label for="age">Age: </label><input type="number" name="age" required>
         <br>
-        <label for="gender">Gender: </label><select name="gender" type="text">
+        <label for="gender">Gender: </label>
+        <select name="gender" type="text">
             <option value="Male">Male</option>
             <option value="Female">Female</option>
         </select>
