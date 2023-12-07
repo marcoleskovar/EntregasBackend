@@ -1,6 +1,5 @@
 import { Router } from 'express'
 import ProductsModel from '../dao/models/products.model.js'
-import UserModel from '../dao/models/user.model.js'
 
 const router = Router()
 
@@ -79,6 +78,13 @@ router.get('/realTimeProducts', auth, async (req, res) => {
 router.get('/profile', auth, async (req, res) => {
     const user = req.session.user
     res.render('profile', user)
+})
+
+router.get('/logout', auth, (req, res) => {
+    req.session.destroy(err => {
+        if(err) return res.send('Logout error')
+        return res.redirect('/login')
+    })
 })
 
 export default router
