@@ -1,24 +1,27 @@
 <section>
     <h1>HOME</h1>
+    <hr>
     <section>
-        <h2>Bienvenido --nombre!</h2>
+        <h2>Bienvenido {{user.name}}!</h2>
+        <a href="/profile">Ver perfil</a>
     </section>
+    <hr>
     <h2>ALL PRODUCTS:</h2>
     <hr>
     <section>
         <ul>
-            <li>Total Docs: {{totalDocs}}</li>
-            <li>Total Pages: {{totalPages}}</li>
-            {{#if hasPrevPage }}
-                <li><a href="/products/?page={{prevPage}}&limit={{limit}}&sort={{sort}}">Previous</a></li>
+            <li>Total Docs: {{result.totalDocs}}</li>
+            <li>Total Pages: {{result.totalPages}}</li>
+            {{#if result.hasPrevPage }}
+                <li><a href="/products/?page={{result.prevPage}}&limit={{result.limit}}&sort={{result.sort}}">Previous</a></li>
             {{/if}}
-            {{#if hasNextPage }}
-                <li><a href="/products/?page={{nextPage}}&limit={{limit}}&sort={{sort}}">Next</a></li>
+            {{#if result.hasNextPage }}
+                <li><a href="/products/?page={{result.nextPage}}&limit={{result.limit}}&sort={{result.sort}}">Next</a></li>
             {{/if}}
         </ul>
     </section>
     <hr>
-    {{#each docs}}
+    {{#each result.docs}}
         <div>
             <h2>{{this.title}}</h2>
             <h4>Id: {{this._id}}</h4>

@@ -1,5 +1,6 @@
 import { Router } from 'express'
 import ProductsModel from '../dao/models/products.model.js'
+import UserModel from '../dao/models/user.model.js'
 
 const router = Router()
 
@@ -56,8 +57,9 @@ router.get('/', auth, async (req, res) => {
 
 router.get('/products', auth, async (req, res) => {
     try{
+        const user = req.session.user
         const result = await queryParams(req)
-        res.render('products', result)
+        res.render('products', {result, user})
     }
     catch(e){
         return res.status(500).json({success: false, error: e.message, detail: e})
@@ -72,6 +74,11 @@ router.get('/realTimeProducts', auth, async (req, res) => {
     catch(e){
         return res.status(500).json({success: false, error: e.message, detail: e})
     }
+})
+
+router.get('/profile', auth, async (req, res) => {
+    const user = req.session.user
+    res.render('profile', user)
 })
 
 export default router
