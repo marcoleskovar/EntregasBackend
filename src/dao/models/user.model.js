@@ -28,8 +28,8 @@ const userSchema = new mongoose.Schema({
         type: Number,
         required: true
     },
-    gender: String
-    
+    gender: String,
+    role: String
 })
 
 const UserModel = mongoose.model(userCollection, userSchema)

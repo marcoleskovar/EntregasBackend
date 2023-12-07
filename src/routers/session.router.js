@@ -18,13 +18,18 @@ const existUser = async (username, email) => {
     if (userEmail) return {success: false, error: `That email is already in use`}
     const user = await UserModel.findOne({username : username})
     if (user) return {success: false, error: `That username is already in use`}
-    
+
     return {success: true}
 }
 
 const sessionActive = (req, res, next) => {
     if(req.session?.user) return res.redirect('/products')
     return next()
+}
+
+const rol = async (email, password) => {
+    if(email === 'adminCoder@coder.com' && password === 'adminCod3r123') return 'admin'
+    else return 'user'
 }
 
 router.get('/login', sessionActive, (req, res) => {
@@ -57,6 +62,7 @@ router.post('/register', async (req, res) => {
         if(exist.success === false) {
             return res.status(401).json({error: exist.error})
         }else{
+            const wichRol = await rol(email, password)
             const newUser = {
                 name,
                 lastname,
@@ -64,7 +70,8 @@ router.post('/register', async (req, res) => {
                 username,
                 password,
                 age,
-                gender
+                gender,
+                role: wichRol
             }
             await UserModel.create(newUser)
             return res.redirect('/session/login')
