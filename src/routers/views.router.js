@@ -83,7 +83,7 @@ router.get('/profile', auth, async (req, res) => {
 router.get('/logout', auth, (req, res) => {
     req.session.destroy(err => {
         if(err) return res.send('Logout error')
-        return res.redirect('/login')
+        return res.redirect('/session/login')
     })
 })
 
