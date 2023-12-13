@@ -18,6 +18,15 @@ router.get('/register', sessionActive, (req, res) => {
     res.render('register', {})
 })
 
+router.get('/github', passport.authenticate('github', {scope: ['user : email']}), (req, res) => {})
+
+router.get('/githubcallback', passport.authenticate('github' , {failureRedirect: '/githuberror'}),(req, res) => {
+    req.session.user = req.user
+    res.redirect('/products')
+})
+
+router.get('/githuberror', (req, res) => {res.send('GITHUB ERROR')})
+
 router.post('/login', passport.authenticate('login'), async (req, res) => {
     try{
         req.session.user = req.user
