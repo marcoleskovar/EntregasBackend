@@ -35,9 +35,9 @@ router.post('/', async (req, res) => {
         const cartData = req.body
         const addCart = await CartModel.create(cartData)
         if(addCart){
-            return res.status(200).json({succes: true,  message: 'Se ha agregado correctamente el carrito'})
+            return res.status(200).json({succes: true,  message: 'Se ha creado correctamente el carrito', id: addCart._id})
         }else{
-            return res.status(500).json({succes: false, error: 'No se ha agregado correctamente el carrito'})
+            return res.status(500).json({succes: false, error: 'No se ha creado correctamente el carrito'})
         }   
     }
     catch(e){

@@ -29,7 +29,14 @@ const userSchema = new mongoose.Schema({
         required: true
     },
     gender: String,
-    role: String
+    role: String,
+    cart: {
+        type: mongoose.ObjectId,
+        required: true,
+        unique: true
+    }
+}, {
+    versionKey: false
 })
 
 const UserModel = mongoose.model(userCollection, userSchema)

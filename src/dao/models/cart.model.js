@@ -9,10 +9,12 @@ const cartSchema = new mongoose.Schema({
                 type: mongoose.ObjectId,
                 ref: 'products'
             },
-            quantity: Number,
+            quantity: Number
         }],
         default: []
     }
+}, {
+    versionKey: false
 })
 
 cartSchema.pre('findOne', function() {
