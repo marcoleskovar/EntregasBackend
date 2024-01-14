@@ -1,6 +1,6 @@
 import { Router } from 'express'
 import mongoose from 'mongoose'
-import ProductsModel from '../dao/models/products.model.js'
+import ProductsModel from '../dao/models/model.products.js'
 
 const router = Router()
 

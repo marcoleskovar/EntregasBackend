@@ -1,7 +1,7 @@
 import { fileURLToPath } from 'url'
 import { dirname } from 'path'
 import bcrypt from "bcrypt"
-import UserModel from './dao/models/user.model.js'
+import UserModel from './dao/models/model.user.js'
 
 
 const __filename = fileURLToPath(import.meta.url)

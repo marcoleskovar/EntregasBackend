@@ -10,11 +10,11 @@ import passport from 'passport'
 import initPassport from './config/passport.config.js'
 
 //IMPORT ROUTERS
-import viewsRouter from './routers/views.router.js'
-import chatRouter from './routers/chat.router.js'
+import viewsRouter from './routers/router.views.js'
+import chatRouter from './routers/router.chat.js'
 import productsRouter from './routers/router.products.js'
 import cartRouter from './routers/router.cart.js'
-import sessionRouter from './routers/session.router.js'
+import sessionRouter from './routers/router.session.js'
 
 //DEFINING CONSTANTS
 const app = express()
