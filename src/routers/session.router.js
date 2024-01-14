@@ -27,6 +27,11 @@ router.get('/githubcallback', passport.authenticate('github' , {failureRedirect:
 
 router.get('/githuberror', (req, res) => {res.send('GITHUB ERROR')})
 
+router.get('/current', (req, res) => {
+    if(req.session?.user) return res.send(req.session.user)
+    else res.redirect('/session/login')
+})
+
 router.post('/login', passport.authenticate('login'), async (req, res) => {
     try{
         req.session.user = req.user
