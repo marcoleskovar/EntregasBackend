@@ -1,30 +1,20 @@
 import { Router } from 'express'
-import mongoose from 'mongoose'
-import ProductsModel from '../dao/models/model.products.js'
 
 const router = Router()
 
-router.get('/', async (req, res) => {
-    try{
-        const products = await ProductsModel.find().lean().exec()
-        let limitParsed = parseInt(req.query.limit)
-        if (limitParsed){
-            if(!isNaN(limitParsed) && limitParsed > 0){
-                if(limitParsed > products.length) return res.status(404).json({error: `limit is above the number of products (${products.length})`})
-                const sliceProducts = products.slice(0, limitParsed)
+//Hay que redirigirlo al controller GetAll 
 
-                return res.status(200).json({success: true, productos: sliceProducts})
-            }else{
-                if(isNaN(limitParsed)) return res.status(400).json({ success: false, error: 'limit has to be a number' })
-                if(limitParsed <= 0) return res.status(400).json({success: false, error: 'limit has to be above 0'})
-            }
-        }
-        return res.status(200).json({success: true, productos: products})
+/* router.get('/', async (req, res) => { 
+    try{
+        const limit = parseInt(req.query.limit)
+        const result = await service.getAllProducts(limit)
+        if(!result.success) return res.status(result.status).json(result)
+        return res.status(200).json(result)
     }
     catch(e){
-        return res.status(500).json({success: false, error: e.message, detail: e})
+        return res.status(500).json({success: false, area: 'Router', catchError: e.message, detail: e})
     }
-})
+}) */
 
 router.get('/:pid', async (req, res) => {
     try{
