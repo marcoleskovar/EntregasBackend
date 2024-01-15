@@ -12,6 +12,7 @@ class ProductsService {
         if (limit){
             if(!isNaN(limit) && limit > 0){
                 if(limit > products.length) return {success: false, area: 'Service', tryError: `limit is above the number of products (${products.length})`, status: 404}
+                
                 const sliceProducts = products.slice(0, limit)
 
                 return {success: true, productos: sliceProducts}
@@ -20,6 +21,7 @@ class ProductsService {
                 else return {success: false, area: 'Service', tryError: 'limit has to be above 0', status: 400}
             }
         }
+
         return {success: true, productos: products}
     }
 
@@ -36,6 +38,7 @@ class ProductsService {
 
     async postProduct (data) {
         const addProduct = await this.model.create(data)
+        
         if(addProduct) return {success: true,  message: 'Se ha agregado correctamente el producto', producto: addProduct}
         else return {success: false, area: 'Service', tryError: 'No se ha agregado correctamente el producto', status: 400}     
     }
@@ -44,6 +47,7 @@ class ProductsService {
         const toObjectId = new mongoose.Types.ObjectId(id)
         const prodDefault = await this.model.findById(toObjectId).lean().exec()
         const prodModified = await this.model.updateOne({_id: id}, toUpdate)
+
         if(prodModified){
             const prodNew = await this.model.findById(toObjectId).lean().exec()
             return {success: true, message: 'Se ha modificado correctamente el producto', before: prodDefault, after: prodNew}
@@ -55,6 +59,7 @@ class ProductsService {
     async deleteProduct (id) {
         const toObjectId = new mongoose.Types.ObjectId(id)
         const deleteProduct = await this.model.deleteOne({_id: toObjectId})
+
         if(deleteProduct) return {success: true, message: 'Se ha eliminado correctamente el producto'}
         else return {success: false, area: 'Service', tryError: 'No se ha eliminado correctamente el producto', status: 400}
     }
