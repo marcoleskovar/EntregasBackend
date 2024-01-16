@@ -1,13 +1,12 @@
 import ProductsModel from "../dao/models/model.products.js"
-import mongoose from "mongoose"
 
 class ProductsService {
     constructor(){
         this.model = ProductsModel
     }
 
-    async getAllProducts (limit) {
-        const products = await this.model.find().lean().exec()
+    async getAllProducts (limit) {//CHECK-DONE
+        const products = await this.model.find().lean()
 
         if (limit){
             if(!isNaN(limit) && limit > 0){
@@ -25,42 +24,44 @@ class ProductsService {
         return {success: true, productos: products}
     }
 
-    async getById (id) {
-        if(id <= 0) return ({success: false, area: 'Service', tryError: 'ID has to be above 0', status: 400})
+    async getProductById (id) {//CHECK-DONE
+        if(id <= 0) return {success: false, area: 'Service', tryError: 'ID has to be above 0', status: 400}
+        
+        const productById = await this.model.findOne({_id: id}).lean()
 
-        const toObjectId = new mongoose.Types.ObjectId(id)
-        const productById = await this.model.findById(toObjectId).lean().exec()
-
-        if (productById === null) return ({success: false, area: 'Service', tryError: 'ID not found', status: 404})
-
-        return ({success: true, producto: productById})
+        if (productById === null) return {success: false, area: 'Service', tryError: 'ProductID not found', status: 404}
+        else return {success: true, producto: productById}
     }
 
-    async postProduct (data) {
+    async postProduct (data) {//CHECK-DONE
         const addProduct = await this.model.create(data)
         
         if(addProduct) return {success: true,  message: 'Se ha agregado correctamente el producto', producto: addProduct}
         else return {success: false, area: 'Service', tryError: 'No se ha agregado correctamente el producto', status: 400}     
     }
 
-    async updateProduct (id, data) {
-        const toObjectId = new mongoose.Types.ObjectId(id)
-        const prodDefault = await this.model.findById(toObjectId).lean().exec()
-        const prodModified = await this.model.updateOne({_id: id}, toUpdate)
+    async updateProduct (id, data) {//CHECK-DONE
+        const prodDefault = await this.getProductById(id)
+
+        if (!prodDefault.success) return prodDefault
+
+        const prodModified = await this.model.findOneAndUpdate({_id: id}, data, {new: true})
 
         if(prodModified){
-            const prodNew = await this.model.findById(toObjectId).lean().exec()
-            return {success: true, message: 'Se ha modificado correctamente el producto', before: prodDefault, after: prodNew}
+            return {success: true, message: 'Se ha modificado correctamente el producto', before: prodDefault, after: prodModified}
         }else{
             return {success: false, area: 'Service', tryError: 'No se ha modificado correctamente el producto', status: 400}
         }
     }
 
-    async deleteProduct (id) {
-        const toObjectId = new mongoose.Types.ObjectId(id)
-        const deleteProduct = await this.model.deleteOne({_id: toObjectId})
+    async deleteProduct (id) {//CHECK-DONE
+        const exist = await this.getProductById(id)
 
-        if(deleteProduct) return {success: true, message: 'Se ha eliminado correctamente el producto'}
+        if(!exist.success) return {success: false, area: 'Service', tryError: 'ID not found', status: 404}
+        
+        const deleteProduct = await this.model.deleteOne({_id: id})
+
+        if(deleteProduct.deletedCount > 0) return {success: true, message: 'Se ha eliminado correctamente el producto'}
         else return {success: false, area: 'Service', tryError: 'No se ha eliminado correctamente el producto', status: 400}
     }
 }

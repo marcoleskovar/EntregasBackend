@@ -2,7 +2,7 @@ import ProductsService from "../services/services.products.js"
 
 const service = new ProductsService()
 
-export const getAllProducts = async (req, res) => {
+export const getAllProducts = async (req, res) => {//CHECK-DONE
     try {
         const limit = parseInt(req.query.limit)
         const result = await service.getAllProducts(limit)
@@ -16,10 +16,10 @@ export const getAllProducts = async (req, res) => {
     }
 }
 
-export const getById = async (req, res) => {
+export const getProductById = async (req, res) => {//CHECK-DONE
     try {
         const id = req.params.pid
-        const result = await service.getById(id)
+        const result = await service.getProductById(id)
 
         if(!result.success) return res.status(result.status).json(result)
 
@@ -30,7 +30,7 @@ export const getById = async (req, res) => {
     }
 }
 
-export const postProduct = async (req, res) => {
+export const postProduct = async (req, res) => {//CHECK-DONE
     try {
         const productData = req.body
         const result = await service.postProduct(productData)
@@ -44,7 +44,7 @@ export const postProduct = async (req, res) => {
     }
 }
 
-export const updateProduct = async (req, res) => {
+export const updateProduct = async (req, res) => {//CHECK-DONE
     try {
         const id = req.params.pid
         const toUpdate = req.body
@@ -59,7 +59,7 @@ export const updateProduct = async (req, res) => {
     }
 }
 
-export const deleteProduct = async (req, res) => {
+export const deleteProduct = async (req, res) => {//CHECK-DONE
     try{
         const id = req.params.pid
         const result = await service.deleteProduct(id)
