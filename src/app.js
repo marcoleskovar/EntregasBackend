@@ -8,6 +8,7 @@ import session from 'express-session'
 import MongoStore from 'connect-mongo'
 import passport from 'passport'
 import initPassport from './config/passport.config.js'
+import dotenv from 'dotenv'
 
 //IMPORT ROUTERS
 import viewsRouter from './routers/router.views.js'
@@ -16,10 +17,13 @@ import productsRouter from './routers/router.products.js'
 import cartRouter from './routers/router.cart.js'
 import sessionRouter from './routers/router.session.js'
 
+//ENV
+dotenv.config()
+
 //DEFINING CONSTANTS
 const app = express()
-const mongoURL = 'mongodb+srv://marcoMONGO:boxitraci0MONGO@ecommerce.djq8g7q.mongodb.net/'
-const mongoName = 'ecommerce'
+const mongoURL = process.env.MONGO_URL
+const mongoName = process.env.MONGO_DBNAME
 
 //CREATING SESSION
 app.use(session({
