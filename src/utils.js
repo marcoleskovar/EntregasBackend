@@ -2,7 +2,9 @@ import { fileURLToPath } from 'url'
 import { dirname } from 'path'
 import bcrypt from "bcrypt"
 import UserModel from './dao/models/model.user.js'
+import dotenv from 'dotenv'
 
+dotenv.config()
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = dirname(__filename)
@@ -33,6 +35,6 @@ export const existUser = async (username, email) => {
 }
 
 export const rol = async (email, password) => {
-    if(email === 'adminCoder@coder.com' && password === 'adminCod3r123') return 'admin'
+    if(email === process.env.ADMIN_EMAIL && password === process.env.ADMIN_PASSWORD) return 'admin'
     else return 'user'
 } 
