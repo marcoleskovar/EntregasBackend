@@ -48,7 +48,7 @@ const initPassport = () => {
     }, async (username, password, done) => {
         try {
             const user = await validateUser(username)
-            if(user.success === false){
+            if(!user.success){
                 return done (user.error, false)
             }
             if(!validatePassword(user.user, password)){
