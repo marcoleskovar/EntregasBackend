@@ -1,6 +1,6 @@
 //IMPORT TOOLS
 import express from 'express'
-import mongoose from 'mongoose'
+/* import mongoose from 'mongoose' */
 import handlebars from 'express-handlebars'
 import __dirname from './utils.js'
 import { Server } from 'socket.io'
@@ -8,28 +8,29 @@ import session from 'express-session'
 import MongoStore from 'connect-mongo'
 import passport from 'passport'
 import initPassport from './config/passport.config.js'
-import dotenv from 'dotenv'
+import config from './config/config.js'
+/* import dotenv from 'dotenv' */
 
 //IMPORT ROUTERS
-import viewsRouter from './routers/router.views.js'
-import chatRouter from './routers/router.chat.js'
 import productsRouter from './routers/router.products.js'
 import cartRouter from './routers/router.cart.js'
-import sessionRouter from './routers/router.session.js'
+/* import viewsRouter from './routers/router.views.js'
+import chatRouter from './routers/router.chat.js'
+import sessionRouter from './routers/router.session.js' */
 
 //ENV
-dotenv.config()
+/* dotenv.config() */
 
 //DEFINING CONSTANTS
 const app = express()
-const mongoURL = process.env.MONGO_URL
-const mongoName = process.env.MONGO_DBNAME
+/* const mongoURL = process.env.MONGO_URL
+const mongoName = process.env.DB_NAME */
 
 //CREATING SESSION
 app.use(session({
     store: MongoStore.create({
-        mongoUrl: mongoURL,
-        dbName: mongoName
+        mongoUrl: config.mongoURL,
+        dbName: config.dbName,
     }),
     secret: 'secret',
     resave: true,
@@ -54,14 +55,16 @@ app.use(express.urlencoded({extended: true}))
 app.use('/static', express.static(__dirname + '/public'))
 
 //ROUTERS
-app.use('/', viewsRouter)
-app.use('/chat', chatRouter)
-app.use('/api/products', productsRouter)
+app.use('/api/products', productsRouter) //CHECK
 app.use('/api/carts', cartRouter)
-app.use('/session', sessionRouter)
+/* app.use('/', viewsRouter)
+app.use('/chat', chatRouter)
+app.use('/session', sessionRouter) */
 
 //LISTEN
-mongoose.connect(mongoURL, {dbName: mongoName})
+app.listen(config.port, () => console.log('RUNNING...'))
+
+/* mongoose.connect(mongoURL, {dbName: mongoName})
     .then(() => {
         //TO CHECK socket
         console.log('DB CONNECTED')
@@ -81,4 +84,4 @@ mongoose.connect(mongoURL, {dbName: mongoName})
                 socket.emit('chat', data)
             })
         })
-    })
+    }) */

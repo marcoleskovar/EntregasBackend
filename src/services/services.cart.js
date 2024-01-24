@@ -1,133 +1,150 @@
-import CartModel from "../dao/models/model.cart.js"
-
-class CartService {
-    constructor(){
-        this.model = CartModel
+export default class CartRepository {
+    constructor (dao) {
+        this.dao = dao
     }
 
-    async getAllCart () {//CHECK-DONE
-        const cart = await this.model.find().lean()
-
-        return {success: true, carrito: cart}
+    //IF SUCCESS
+    async success (message, data) {
+        const result = {success: true, message: message, result: data}
+        return result
     }
 
-
-    async getCartById (id) {//CHECK-DONE
-        if (id <= 0) return {success: false, area: 'Service', tryError: 'ID has to be above 0', status: 400}
-        
-        const cartById = await this.model.findOne({_id: id}).lean()
-
-        if (cartById === null) return {success: false, area: 'Service', tryError: 'CartID not found', status: 404}
-
-        return {success: true, carrito: cartById}
+    //IF ERROR
+    async error (message, status) {
+        const result = {success: false, area: 'Cart-Service', tryError: message, status: status}
+        return result
     }
-
-
-    async postCart (data) {//CHECK-DONE
-        const addCart = await this.model.create(data)
-        
-        if (addCart) return {success: true,  message: 'Se ha creado correctamente el carrito', cartID: addCart._id}
-        else return {success: false, area: 'Service', tryError: 'No se ha creado correctamente el carrito', status: 400}     
-    }
-
     
+    //ALL CARTS
+    async getCarts () {
+        const carts = await this.dao.getCarts()
+
+        return await this.success('Se han encontrado correctamente los carritos', carts)
+    }
+
+    //SPECIFIC CART
+    async getCartById (id) {
+        if (id <= 0) return await this.error('ID has to be above 0', 400)
+        
+        const cartById = await this.dao.getCartById(id)
+
+        if (cartById === null) return await this.error( 'CartID not found', 404)
+        else return await this.success('El carrito se encontro correctamente', cartById)
+    }
+
+    //POST CART
+    async createCart (data) {
+        const create = await this.dao.createCart(data)
+        
+        if(!create) return await this.error('No se ha creado correctamente el carrito', 400)
+        else return await this.success('Se ha creado correctamente el carrito', create)
+    }
+
+    //ADD PRODUCT TO CART
     async addToCart (cid, productData) {//CHECK-DONE
         const cart = await this.getCartById(cid)
 
         if (!cart.success) return cart
 
-        const product = productData
-
-        if (!product.success) return product
-
-        const result = await this.model.findOneAndUpdate(
-            {_id: cart.carrito._id, "products.product": product.producto._id},
-            {$inc: {"products.$.quantity": 1}},
-            {new: true}
-        ).lean()
+        const updateQuery = {
+            query: {_id: cid, "products.product": productData.result._id},
+            update: {$inc: {"products.$.quantity": 1}},
+            options: {new: true}
+        }
+        const result = await this.dao.updateCart(updateQuery)
 
         if(!result) {
-            await this.model.findOneAndUpdate(
-                { _id: cart.carrito._id },
-                {
+            const cartUpdateQuery = {
+                query: { _id: cart.result._id },
+                update: {
                     $push: {
                         products: {
-                            product: product.producto._id,
+                            product: productData.result._id,
                             quantity: 1,
-                        }
-                    }
+                        },
+                    },
                 },
-                { new: true }
-            ).lean()
+                options: { new: true }
+            }
+                await this.dao.updateCart(cartUpdateQuery)
         }
-        return {success: true,  message: 'Se ha agregado correctamente el producto al carrito', producto: product.producto}
+
+        return await this.success('Se ha agregado correctamente el producto al carrito', productData.result)
     }
 
-
-    async updateCart (cid, data) {//CHECK-DONE
+    //CHANGE CART
+    async updateCart(cid, data) {//CHECK
         const cart = await this.getCartById(cid)
-
+        
         if (!cart.success) return cart
 
-        if(!Array.isArray(data)) return {success: false, area: 'Service', tryError: 'The product is not valid', status: 400}
 
-        const cartModified = await this.model.findOneAndUpdate(
-            { _id: cid },
-            { $set: { products: data } },
-            { new: true }
-        ).lean()
+        const toUpdate = data.map(item => ({
+            product: item.product,
+            quantity: item.quantity || 1
+        }))
 
-        if(cartModified) return {success: false, area: 'Service', tryError: 'No se ha modificado correctamente el carrito', status: 400}
-        return {success: true, message: 'Se ha modificado correctamente el carrito', before: cart, after: cartModified}
+        const cartUpdateQuery = {
+            query: { _id: cart.result._id },
+            update: {
+                $set: {
+                    products: toUpdate,
+                },
+            },
+            options: { new: true, upsert: true },
+        }
+        const result = await this.dao.updateCart(cartUpdateQuery)
+
+        if (!result) return await this.error('No se ha modificado correctamente el carrito', 400)
+        return await this.success('Se ha modificado correctamente el carrito', result)
     }
 
-
+    
+    //UPDATE PRODUCT QUANTITY
     async updateCartQuant (cid, pid, data) {//CHECK-DONE
         const cart = await this.getCartById(cid)
 
         if (!cart.success) return cart
 
-        const cartModified = await this.model.findOneAndUpdate(
-            {_id: cid, "products.product": pid},
-            {$set: {"products.$.quantity": data}},
-            {new: true}
-        ).lean()
+        const cartUpdateQuery = {
+            query: {_id: cid, "products.product": pid},
+            update: {$set: {"products.$.quantity": data}},
+            options: {new: true}
+        }
 
-        if(!cartModified) return {success: false, area: 'Service', tryError: 'No se ha modificado correctamente el carrito', status: 400}
-        return {success: true, message: 'Se ha modificado correctamente el carrito', before: cart, after: cartModified}
+        const cartModified = await this.dao.updateCart(cartUpdateQuery)
+
+        if(!cartModified) return await this.error('No se ha modificado correctamente el carrito', 400)
+        else return await this.success('Se ha modificado correctamente el carrito', cartModified)
     }
 
-
-    async deleteCart (id) {//CHECK-DONE
-        const cart = await this.getCartById(id)
-
-        if (!cart.success) return cart
-
-        const deleteCart = await this.model.deleteOne({_id: id})
-
-        if(!deleteCart) return {success: false, area: 'Service', tryError: 'No se ha eliminado correctamente el carrito', status: 400}
-
-        return {success: true, message: 'Se ha eliminado correctamente el carrito'}
-    }
-
-
-    async deleteProdCart (cid, pid) {//CHECK-DONE
+    //DELETE PRODUCT FROM CART
+    async deleteProdCart (cid, pid) {
         const cart = await this.getCartById(cid)
 
         if (!cart.success) return cart
 
-        const productID = pid.producto._id
+        const cartUpdateQuery = {
+            query: {_id: cid},
+            update: {$pull: {products: {product: pid}}},
+            options: {new: true}
+        }
 
-        const result = await this.model.findOneAndUpdate(
-            { _id: cart.carrito._id },
-            { $pull: { products: { product: productID } } },
-            { new: true }
-        ).lean()
+        const cartModified = await this.dao.updateCart(cartUpdateQuery)
+        
+        if(!cartModified) return await this.error('No se ha eliminado correctamente el producto del carrito', 400)
+        else return await this.success('Se ha eliminado correctamente el producto del carrito', cartModified)
+    }
+    
+    //DELETE CART
+    async deleteCart (id) {
+        const exist = await this.getCartById(id)
 
-        if(!result) return {success: false, area: 'Service', tryError: 'No se ha eliminado correctamente el producto del carrito', status: 400}
+        if (!exist.success) return exist
 
-        return {success: true, message: 'Se ha eliminado correctamente el producto del carrito'}
+        const cart = await this.dao.deleteCart(id)
+
+        if (cart.deletedCount > 0) return await this.success('Se ha eliminado correctamente el carrito', exist.result)
+        else return await this.error('No se ha eliminado correctamente el carrito', 400)
     }
 }
-
-export default CartService
