@@ -1,10 +1,8 @@
 import { fileURLToPath } from 'url'
 import { dirname } from 'path'
+import { UserService } from './services/service.js'
 import bcrypt from "bcrypt"
-import UserModel from './dao/models/model.user.js'
-import dotenv from 'dotenv'
-
-dotenv.config()
+import config from './config/config.js'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = dirname(__filename)
@@ -19,22 +17,22 @@ export const validatePassword = (user, password) => {
     return bcrypt.compareSync(password, user.password)
 }
 
-export const validateUser = async (email) => {
-    const userEmail = await UserModel.findOne({email : email})
-    if (!userEmail) return {success: false, error: `User not found`}
-
-    return {success: true, user: userEmail}
-}
 export const existUser = async (username, email) => {
-    const userEmail = await UserModel.findOne({email : email})
-    if (userEmail) return {success: false, error: `That email is already in use`}
-    const user = await UserModel.findOne({username : username})
-    if (user) return {success: false, error: `That username is already in use`}
+    const userUsername = await UserService.isInUse('username', username)
+    if (!userUsername.success) return userUsername
 
-    return {success: true}
+    const userEmail = await UserService.isInUse('email', email)
+    if (!userEmail.success) return userEmail
+    
+    return userEmail
+}
+
+export const validateUser = async (email) => {
+    const result = await UserService.getUserByEmail(email)
+    return result
 }
 
 export const rol = async (email, password) => {
-    if(email === process.env.ADMIN_EMAIL && password === process.env.ADMIN_PASSWORD) return 'admin'
+    if(email === config.adminEmail && password === config.adminPassword) return 'admin'
     else return 'user'
 } 

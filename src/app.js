@@ -14,9 +14,11 @@ import config from './config/config.js'
 //IMPORT ROUTERS
 import productsRouter from './routers/router.products.js'
 import cartRouter from './routers/router.cart.js'
-/* import viewsRouter from './routers/router.views.js'
+import sessionRouter from './routers/router.session.js'
+import viewsRouter from './routers/router.views.js'
+/* 
 import chatRouter from './routers/router.chat.js'
-import sessionRouter from './routers/router.session.js' */
+ */
 
 //ENV
 /* dotenv.config() */
@@ -57,9 +59,11 @@ app.use('/static', express.static(__dirname + '/public'))
 //ROUTERS
 app.use('/api/products', productsRouter) //CHECK
 app.use('/api/carts', cartRouter)
-/* app.use('/', viewsRouter)
+app.use('/session', sessionRouter) 
+app.use('/', viewsRouter)
+/*
 app.use('/chat', chatRouter)
-app.use('/session', sessionRouter) */
+*/
 
 //LISTEN
 app.listen(config.port, () => console.log('RUNNING...'))

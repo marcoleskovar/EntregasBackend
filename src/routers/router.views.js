@@ -1,4 +1,4 @@
-/* import { Router } from 'express'
+import { Router } from 'express'
 import { auth, homeView, logoutView, productsView, profileView, realTimeProductsView } from '../controllers/controller.view.js'
 
 const router = Router()
@@ -13,4 +13,4 @@ router.get('/profile', auth, profileView)
 
 router.get('/logout', auth, logoutView)
 
-export default router */
+export default router

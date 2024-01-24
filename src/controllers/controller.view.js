@@ -1,4 +1,4 @@
-/* import ViewsServices from "../services/services.session.js"
+import ViewsServices from "../services/services.session.js"
 
 const view = new ViewsServices()
 
@@ -55,4 +55,4 @@ export const logoutView = async (req, res) => {
         if(err) return res.send('Logout error')
         return res.redirect('/session/login')
     })   
-} */
+}

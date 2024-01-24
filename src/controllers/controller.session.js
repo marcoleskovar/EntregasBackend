@@ -1,4 +1,4 @@
-/* export const getLogin = (req, res) => {
+export const getLogin = (req, res) => {
     res.render('login', {})
 }
 
@@ -24,7 +24,6 @@ export const getCurrent = (req, res) => {
 
 export const postLogin = async (req, res) => {
     try {
-        console.log(req.user);
         req.session.user = req.user
         return res.redirect('/products')
     }
@@ -40,4 +39,4 @@ export const postRegister = async (req, res) => {
     catch (e) {
         return res.status(500).json({success: false, error: e.message, detail: e})
     }
-} */
+}

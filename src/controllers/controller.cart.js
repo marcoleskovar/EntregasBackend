@@ -1,5 +1,4 @@
-import { CartService } from "../services/service.js"
-import { ProductService } from "../services/service.js"
+import { CartService, ProductService } from "../services/service.js"
 
 const service = CartService
 

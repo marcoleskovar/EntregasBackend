@@ -1,9 +1,8 @@
 import passport from 'passport'
 import local from 'passport-local'
-import UserModel from '../dao/models/model.user.js'
-import CartModel from '../dao/models/model.cart.js'
 import GitHubStrategy from 'passport-github2'
-import { createHash, validatePassword, validateUser, existUser, rol } from '../utils.js'
+import { createHash, validateUser, existUser, rol, validatePassword } from '../utils.js'
+import { UserService, CartService } from '../services/service.js'
 
 const LocalStrategy = local.Strategy
 
@@ -18,11 +17,11 @@ const initPassport = () => {
                 return done ('EMPTY FIELDS', false)
             }
             const exist = await existUser(username, emailParam)
-            if(exist.success === false){
-                return done (exist.error, false)
-            }else if (exist.success === true){
-                const wichRol = await rol (emailParam, password)
-                const cartId = await CartModel.create({})
+            if(!exist.success){
+                return done (exist.tryError, false)
+            }else{
+                const wichRol = await rol(emailParam, password)
+                const cartId = await CartService.createCart()
                 const newUser = {
                     name,
                     lastname,
@@ -32,14 +31,14 @@ const initPassport = () => {
                     age,
                     gender,
                     role: wichRol,
-                    cart: cartId._id
+                    cart: cartId.result._id
                 }
-                const result = await UserModel.create(newUser)
-                return done (null, result)
+                const result = await UserService.createUser(newUser)
+                return done (null, result.result)
             }   
         }
-        catch (e) {
-            return done ('ERROR TO REGISTER: ' + e)
+        catch (error) {
+            return done ('ERROR TO REGISTER: ' + error)
         }
     }))
 
@@ -49,12 +48,12 @@ const initPassport = () => {
         try {
             const user = await validateUser(username)
             if(!user.success){
-                return done (user.error, false)
+                return done (user.tryError, false)
             }
-            if(!validatePassword(user.user, password)){
+            if(!validatePassword(user.result, password)){
                 return done ('INCORRECT PASSWORD', false)
             }
-            return done (null, user.user)
+            return done (null, user.result)
         }
         catch(e){
             return done ('ERROR TO LOGIN: ' + e)
@@ -67,10 +66,11 @@ const initPassport = () => {
         callbackURL: 'http://127.0.0.1:8080/session/githubcallback'
     }, async (accessToken, refreshToken, profile, done) => {
         try {
-            const user = await UserModel.findOne({email: profile._json.email})
-            if(user){
-                return done (null, user)
+            const user = await UserService.getUserByEmail(profile._json.email)
+            if(user.success){
+                return done (null, user.result)
             }else{
+                const cartId = await CartService.createCart()
                 const newUser = {
                     name: profile._json.name,
                     lastname: `${profile._json.name}_lastname`,
@@ -79,10 +79,11 @@ const initPassport = () => {
                     password: `${profile._json.email}_password`,
                     age: 0,
                     gender: 'undefined',
-                    role: 'gitHub-user'
+                    role: 'gitHub-user',
+                    cart: cartId.result._id
                 }
-                const result = await UserModel.create(newUser)
-                return done (null, result)
+                const result = await UserService.createUser(newUser)
+                return done (null, result.result)
             }
         }
         catch(e){
@@ -95,8 +96,8 @@ const initPassport = () => {
     })
 
     passport.deserializeUser(async(id, done) => {
-        const user = await UserModel.findById(id)
-        done (null, user)
+        const user = await UserService.getUserById(id)
+        done (null, user.result)
     })
 }
 
