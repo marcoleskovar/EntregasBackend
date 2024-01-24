@@ -1,4 +1,4 @@
-import { Router } from "express"
+/* import { Router } from "express"
 import passport from "passport"
 import { getCurrent, getGithub, getGithubCallback, getGithubError, getLogin, getRegister, postLogin, postRegister } from "../controllers/controller.session.js"
 
@@ -25,4 +25,4 @@ router.post('/login', passport.authenticate('login'), postLogin)
 
 router.post('/register', passport.authenticate('register'), postRegister)
 
-export default router
+export default router */

@@ -1,4 +1,4 @@
-import ProductsModel from "../dao/models/model.products.js"
+/* import ProductsModel from "../dao/models/model.products.js"
 
 class ViewsServices {
 
@@ -43,4 +43,4 @@ class ViewsServices {
     }
 }
 
-export default ViewsServices
+export default ViewsServices */

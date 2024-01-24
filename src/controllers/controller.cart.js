@@ -1,129 +1,140 @@
-import CartService from "../services/services.cart.js"
-import ProductsService from "../services/services.products.js"
+import { CartService } from "../services/service.js"
+import { ProductService } from "../services/service.js"
 
-const productService = new ProductsService()
-const service = new CartService()
+const service = CartService
 
-export const getAllCart = async (req, res) => {//CHECK-DONE
+//IF ERROR - CONTROLLER
+const controllerError = async (e) => {
+    const result = {success: false, area: 'Cart-Controller', catchError: e.message, detail: e}
+    return result
+}
+
+export const getCarts = async (req, res) => {//CHECK
     try {
-        const result = await service.getAllCart()
+        const result = await service.getCarts()
 
-        if(result.success) return res.status(200).json(result)
-    }
-    catch (e) {
-        return res.status(500).json({success: false, area: 'Controller', catchError: e.message, detail: e})
+        if (!result.success) return res.status(result.status).json(result)
+        else return res.status(200).json(result)
+    } catch (error) {
+        const err = await controllerError(error)
+        return res.status(500).json(err)
     }
 }
 
-export const getCartById = async (req, res) => {//CHECK-DONE
+export const getCartById = async (req, res) => {//CHECK
     try {
         const id = req.params.cid
         const result = await service.getCartById(id)
 
-        if(!result.success) return res.status(result.status).json(result)
-
-        return res.status(200).json(result)
-    }
-    catch (e) {
-        return res.status(500).json({success: false, area: 'Controller', catchError: e.message, detail: e})
+        if (!result.success) return res.status(result.status).json(result)
+        else return res.status(200).json(result)
+    } catch (error) {
+        const err = await controllerError(error)
+        return res.status(500).json(err)
     }
 }
 
-export const postCart = async (req, res) => {//CHECK-DONE
+export const createCart = async (req, res) => {//CHECK
     try {
-        const cartData = req.body
-        const result = await service.postCart(cartData)
+        const data = req.body
+        const result = await service.createCart(data)
 
-        if(!result.success) return res.status(result.status).json(result)
-
-        return res.status(200).json(result)
-    }
-    catch (e) {
-        return res.status(500).json({success: false, area: 'Controller', catchError: e.message, detail: e})
-    }
-}
-
-export const addToCart = async (req, res) => {//CHECK-DONE
-    try {
-        const cartID = req.params.cid
-        const productID = req.params.pid
-
-        const product = await productService.getProductById(productID)
-
-        if(!product.success) return res.status(product.status).json(product)
-
-        const result = await service.addToCart(cartID, product)
-        
-        if(!result.success) return res.status(result.status).json(result)
-
-        return res.status(200).json(result)
-    }
-    catch (e) {
-        return res.status(500).json({success: false, area: 'Controller', catchError: e.message, detail: e})
+        if (!result.success) return res.status(result.status).json(result)
+        else return res.status(200).json(result)
+    } catch (error) {
+        const err = await controllerError(error)
+        return res.status(500).json(err)
     }
 }
 
-export const updateCart = async (req, res) => {//CHECK-DONE
+export const addToCart = async (req, res) => {
     try {
         const cid = req.params.cid
-        const data = req.body
-        const result = await service.updateCart(cid, data)
+        const pid = req.params.pid
 
-        if(!result.success) return res.status(result.status).json(result)
+        const product = await ProductService.getProductById(pid)
 
-        return res.status(200).json(result)
-    }
-    catch (e) {
-        return res.status(500).json({success: false, area: 'Controller', catchError: e.message, detail: e})
+        if (!product.success) return res.status(product.status).json(product)
+
+        const result = await service.addToCart(cid, product)
+
+        if (!result.success) return res.status(result.status).json(result)
+        else return res.status(200).json(result)
+    } catch (error) {
+        const err = await controllerError(error)
+        return res.status(500).json(err)
     }
 }
 
-export const updateCartQuant = async (req, res) => {//CHECK-DONE
+export const updateCart = async (req, res) => {//body = [{"product": "pid"}]
+    try {
+        const id = req.params.cid
+        const data = req.body
+
+        for (const item of data) {
+            const product = await ProductService.getProductById(item.product)
+            
+            if (!product.success) return res.status(product.status).json(product)
+        } 
+
+        const result = await service.updateCart(id, data)
+
+        if (!result.success) return res.status(result.status).json(result)
+        else return res.status(200).json(result)
+    } catch (error) {
+        const err = await controllerError(error)
+        return res.status(500).json(err)
+    }
+}
+
+export const updateCartQuant = async (req, res) => {//body = {quantity: number}
     try {
         const cid = req.params.cid
         const pid = req.params.pid
         const quantity = req.body.quantity
+
+        const product = await ProductService.getProductById(pid)
+
+        if (!product.success) return res.status(product.status).json(product)
+
         const result = await service.updateCartQuant(cid, pid, quantity)
-        
-        if(!result.success) return res.status(result.status).json(result)
 
-        return res.status(200).json(result)
-    }
-    catch (e) {
-        return res.status(500).json({success: false, area: 'Controller', catchError: e.message, detail: e})
-    }
-}
-
-export const deleteCart = async (req, res) => {//CHECK-DONE
-    try {
-        const cid = req.params.cid
-        const result = await service.deleteCart(cid)
-
-        if(!result.success) return res.status(result.status).json(result)
-        
-        return res.status(200).json(result)
-    }
-    catch (e) {
-        return res.status(500).json({success: false, area: 'Controller', catchError: e.message, detail: e})
+        if (!result.success) return res.status(result.status).json(result)
+        else return res.status(200).json(result)
+    } catch (error) {
+        const err = await controllerError(error)
+        return res.status(500).json(err)
     }
 }
 
-export const deleteProdCart = async (req, res) => {//CHECK-DONE
+export const deleteProdCart = async (req, res) => {
     try {
         const cid = req.params.cid
         const pid = req.params.pid
 
-        const product = await productService.getProductById(pid)
+        const product = await ProductService.getProductById(pid)
 
-        if(!product.success) return res.status(product.status).json(product)
+        if (!product.success) return res.status(product.status).json(product)
 
-        const result = await service.deleteProdCart(cid, product)
-        
-        if(!result.success) return res.status(result.status).json(result)
+        const result = await service.deleteProdCart(cid, pid)
 
-        return res.status(200).json(result)
+        if (!result.success) return res.status(result.status).json(result)
+        else return res.status(200).json(result)
+    } catch (error) {
+        const err = await controllerError(error)
+        return res.status(500).json(err)
     }
-    catch (e) {
-        return res.status(500).json({success: false, area: 'Controller', catchError: e.message, detail: e})
+}
+
+export const deleteCart = async (req, res) => {//CHECK
+    try {
+        const id = req.params.cid
+        const result = await service.deleteCart(id)
+
+        if (!result.success) return res.status(result.status).json(result)
+        else return res.status(200).json(result)
+    } catch (error) {
+        const err = await controllerError(error)
+        return res.status(500).json(err)
     }
 }

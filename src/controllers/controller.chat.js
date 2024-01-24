@@ -1,4 +1,4 @@
-import ChatService from '../services/services.chat.js'
+/* import ChatService from '../services/services.chat.js'
 
 const service = new ChatService()
 
@@ -25,4 +25,4 @@ export const postMessage = async (req, res) => {
     catch (e) {
         return res.status(500).json({success: false, area: 'Controller', catchError: e.message, detail: e})
     }
-}
+} */

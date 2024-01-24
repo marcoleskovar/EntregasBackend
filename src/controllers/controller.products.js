@@ -1,74 +1,74 @@
-import ProductsService from "../services/services.products.js"
+import { ProductService } from "../services/service.js"
 
-const service = new ProductsService()
+const service = ProductService
 
-export const getAllProducts = async (req, res) => {//CHECK-DONE
+const controllerError = async (e) => {
+    const result = {success: false, area: 'Product-Controller', catchError: e.message, detail: e}
+    return result
+}
+
+export const getProducts = async (req, res) => {//CHECK
     try {
-        const limit = parseInt(req.query.limit)
-        const result = await service.getAllProducts(limit)
+        const limit = req.query.limit
+        const result = await service.getProducts(limit)
 
-        if(!result.success) return res.status(result.status).json(result)
-
-        return res.status(200).json(result)
-    }
-    catch (e) {
-        return res.status(500).json({success: false, area: 'Controller', catchError: e.message, detail: e})
+        if (!result.success) return res.status(result.status).json(result)
+        else return res.status(200).json(result)
+    } catch (error) {
+        const err = await controllerError(error)
+        return res.status(500).json(err)
     }
 }
 
-export const getProductById = async (req, res) => {//CHECK-DONE
+export const getProductById = async (req, res) => {//CHECK
     try {
         const id = req.params.pid
         const result = await service.getProductById(id)
 
-        if(!result.success) return res.status(result.status).json(result)
-
-        return res.status(200).json(result)
-    }
-    catch (e) {
-        return res.status(500).json({success: false, area: 'Controller', catchError: e.message, detail: e})
+        if (!result.success) return res.status(result.status).json(result)
+        else return res.status(200).json(result)
+    } catch (error) {
+        const err = await controllerError(error)
+        return res.status(500).json(err)
     }
 }
 
-export const postProduct = async (req, res) => {//CHECK-DONE
+export const createProduct = async (req, res) => {//CHECK
     try {
-        const productData = req.body
-        const result = await service.postProduct(productData)
+        const data = req.body
+        const result = await service.createProduct(data)
 
-        if(!result.success) return res.status(result.status).json(result)
-
-        return res.status(200).json(result)
-    }
-    catch (e) {
-        return res.status(500).json({success: false, area: 'Controller', catchError: e.message, detail: e})
+        if (!result.success) return res.status(result.status).json(result)
+        else return res.status(200).json(result)
+    } catch (error) {
+        const err = await controllerError(error)
+        return res.status(500).json(err)
     }
 }
 
-export const updateProduct = async (req, res) => {//CHECK-DONE
+export const updateProduct = async (req, res) => {//CHECK
     try {
         const id = req.params.pid
-        const toUpdate = req.body
-        const result = await service.updateProduct (id, toUpdate)
+        const data = req.body
+        const result = await service.updateProduct(id, data)
 
-        if(!result.success) return res.status(result.status).json(result)
-
-        return res.status(200).json(result)
-    }
-    catch (e) {
-        return res.status(500).json({success: false, area: 'Controller', catchError: e.message, detail: e})
+        if (!result.success) return res.status(result.status).json(result)
+        else return res.status(200).json(result)
+    } catch (error) {
+        const err = await controllerError(error)
+        return res.status(500).json(err)
     }
 }
 
-export const deleteProduct = async (req, res) => {//CHECK-DONE
-    try{
+export const deleteProduct = async (req, res) => {//CHECK
+    try {
         const id = req.params.pid
         const result = await service.deleteProduct(id)
 
-        if(!result.success) return res.status(result.status).json(result)
-
-        return res.status(200).json(result)
-    }
-    catch (e) {
-        return res.status(500).json({success: false, area: 'Controller', catchError: e.message, detail: e})
+        if (!result.success) return res.status(result.status).json(result)
+        else return res.status(200).json(result)
+    } catch (error) {
+        const err = await controllerError(error)
+        return res.status(500).json(err)
     }
 }
