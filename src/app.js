@@ -12,12 +12,12 @@ import config from './config/config.js'
 /* import dotenv from 'dotenv' */
 
 //IMPORT ROUTERS
-import productsRouter from './routers/router.products.js'
-import cartRouter from './routers/router.cart.js'
-import sessionRouter from './routers/router.session.js'
+import productsRouter from './routers/product.router.js'
+import cartRouter from './routers/cart.router.js'
+import sessionRouter from './routers/session.router.js'
 import viewsRouter from './routers/router.views.js'
 /* 
-import chatRouter from './routers/router.chat.js'
+import chatRouter from './routers/chat.router.js'
  */
 
 //ENV

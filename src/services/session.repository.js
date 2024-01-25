@@ -1,4 +1,4 @@
-import ProductsModel from "../dao/models/model.products.js"
+import ProductsModel from "../dao/models/product.model.js"
 
 class ViewsServices {
 

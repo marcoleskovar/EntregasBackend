@@ -1,7 +1,7 @@
 import { Product, Cart, User } from "../dao/factory.js"
 
-import ProductRepository from "./products.repository.js"
-import CartRepository from "./services.cart.js"
+import ProductRepository from "./product.repository.js"
+import CartRepository from "./cart.repository.js"
 import UserRepository from "./user.repository.js"
 
 export const ProductService = new ProductRepository(new Product())

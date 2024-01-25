@@ -1,4 +1,4 @@
-import UserModel from "../models/model.user.js"
+import UserModel from "../models/user.model.js"
 
 export default class User {
     constructor() {this.model = UserModel}

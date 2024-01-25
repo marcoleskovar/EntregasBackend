@@ -1,6 +1,6 @@
 import { Router } from "express"
 import passport from "passport"
-import { getCurrent, getGithub, getGithubCallback, getGithubError, getLogin, getRegister, postLogin, postRegister } from "../controllers/controller.session.js"
+import { getCurrent, getGithub, getGithubCallback, getGithubError, getLogin, getRegister, postLogin, postRegister } from "../controllers/session.controller.js"
 
 const router = Router()
 

@@ -1,13 +1,14 @@
 import config from "../config/config.js"
 import mongoose from "mongoose"
+import { opts } from "../config/commander.js"
 
 export let Product
 export let Cart
 export let User
 
-console.log('PERSISTENCIA:', config.persistence)
+console.log('PERSISTENCIA:', opts.persistence)
 
-switch (config.persistence) {
+switch (opts.persistence) {
     case 'MONGO':
         await mongoose.connect(config.mongoURL, {dbName: config.dbName})
         console.log('DB CONNECTED')
@@ -22,7 +23,6 @@ switch (config.persistence) {
 
         break
     case 'FILE':
-    
         break
     case 'MEMORY':
 

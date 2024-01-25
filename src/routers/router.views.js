@@ -1,5 +1,5 @@
 import { Router } from 'express'
-import { auth, homeView, logoutView, productsView, profileView, realTimeProductsView } from '../controllers/controller.view.js'
+import { auth, homeView, logoutView, productsView, profileView, realTimeProductsView } from '../controllers/view.controller.js'
 
 const router = Router()
 

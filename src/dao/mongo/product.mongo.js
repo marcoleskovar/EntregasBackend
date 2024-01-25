@@ -1,4 +1,4 @@
-import ProductsModel from "../models/model.products.js"
+import ProductsModel from "../models/product.model.js"
 
 export default class Product {
     async getProducts () {return ProductsModel.find().lean()}//CHECK

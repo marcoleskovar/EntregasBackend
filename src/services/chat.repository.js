@@ -1,4 +1,4 @@
-/* import ChatModel from "../dao/models/model.chat.js"
+/* import ChatModel from "../dao/models/chat.model.js"
 
 class ChatService {
     constructor() {

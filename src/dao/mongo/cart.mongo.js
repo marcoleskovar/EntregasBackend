@@ -1,4 +1,4 @@
-import CartModel from "../models/model.cart.js"
+import CartModel from "../models/cart.model.js"
 
 export default class Cart {
     constructor () {this.model = CartModel}

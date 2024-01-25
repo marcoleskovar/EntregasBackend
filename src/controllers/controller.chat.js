@@ -1,4 +1,4 @@
-/* import ChatService from '../services/services.chat.js'
+/* import ChatService from '../services/chat.repository.js'
 
 const service = new ChatService()
 

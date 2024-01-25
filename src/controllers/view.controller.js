@@ -1,4 +1,4 @@
-import ViewsServices from "../services/services.session.js"
+import ViewsServices from "../services/session.repository.js"
 
 const view = new ViewsServices()
 
