@@ -55,7 +55,7 @@ export const addToCart = async (req, res) => {
 
         if (!product.success) return res.status(product.status).json(product)
 
-        const result = await service.addToCart(cid, product)
+        const result = await service.addToCart(cid, product.result)
 
         if (!result.success) return res.status(result.status).json(result)
         else return res.status(200).json(result)
@@ -82,6 +82,10 @@ export const updateCart = async (req, res) => {//body = [{"product": "pid"}]
         else return res.status(200).json(result)
     } catch (error) {
         const err = await controllerError(error)
+        if (err.catchError === 'data is not iterable'){
+            const nonIterableData = await controllerError('Body debe recibir por lo menos << [{``product``: productID}] >>')
+            return res.status(500).json(nonIterableData)
+        }
         return res.status(500).json(err)
     }
 }
@@ -91,6 +95,8 @@ export const updateCartQuant = async (req, res) => {//body = {quantity: number}
         const cid = req.params.cid
         const pid = req.params.pid
         const quantity = req.body.quantity
+
+        if (!quantity) throw new Error ('Body debe recibir ``{quantity``: Number}')
 
         const product = await ProductService.getProductById(pid)
 

@@ -23,6 +23,14 @@ switch (opts.persistence) {
 
         break
     case 'FILE':
+        const {default: ProductFile} = await import ('./file/managers/ProductManager.js')
+        const {default: CartFile} = await import ('./file/managers/CartManager.js')
+        const {default: UserFile} = await import ('./file/managers/UserManager.js')
+
+        Product = ProductFile
+        Cart = CartFile
+        User = UserFile
+        
         break
     case 'MEMORY':
 

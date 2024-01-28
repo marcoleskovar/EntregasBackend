@@ -18,17 +18,19 @@ export const validatePassword = (user, password) => {
 }
 
 export const existUser = async (username, email) => {
-    const userUsername = await UserService.isInUse('username', username)
-    if (!userUsername.success) return userUsername
+    if (!username || !email) throw new Error ('Either username or email are empty')
 
-    const userEmail = await UserService.isInUse('email', email)
-    if (!userEmail.success) return userEmail
+    const userUsername = await UserService.getByUsername(username)
+    if (userUsername.success) throw new Error ('Username already in use')
+
+    const userEmail = await UserService.getByEmail(email)
+    if (userEmail.success) throw new Error ('Email already in use')
     
     return userEmail
 }
 
 export const validateUser = async (email) => {
-    const result = await UserService.getUserByEmail(email)
+    const result = await UserService.getByEmail(email)
     return result
 }
 

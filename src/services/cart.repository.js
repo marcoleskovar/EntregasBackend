@@ -29,7 +29,7 @@ export default class CartRepository {
         const cartById = await this.dao.getCartById(id)
 
         if (cartById === null) return await this.error( 'CartID not found', 404)
-        else return await this.success('El carrito se encontro correctamente', cartById)
+        else return await this.success('El carrito se encontro correctamente', cartById)//{id, products: prodArray}
     }
 
     //POST CART
@@ -43,33 +43,33 @@ export default class CartRepository {
     //ADD PRODUCT TO CART
     async addToCart (cid, productData) {//CHECK-DONE
         const cart = await this.getCartById(cid)
-
-        if (!cart.success) return cart
+        
+        if(!cart.success) return cart
 
         const updateQuery = {
-            query: {_id: cid, "products.product": productData.result._id},
+            query: {_id: cid, "products.product": productData._id || productData.id},
             update: {$inc: {"products.$.quantity": 1}},
-            options: {new: true}
+            options: {new: true, method: 'plus_one' }
         }
         const result = await this.dao.updateCart(updateQuery)
 
         if(!result) {
             const cartUpdateQuery = {
-                query: { _id: cart.result._id },
+                query: { _id: cid },
                 update: {
                     $push: {
                         products: {
-                            product: productData.result._id,
+                            product: productData._id || productData.id,
                             quantity: 1,
                         },
                     },
                 },
-                options: { new: true }
+                options: {new: true, method: 'create'}
             }
-                await this.dao.updateCart(cartUpdateQuery)
+            await this.dao.updateCart(cartUpdateQuery)
         }
 
-        return await this.success('Se ha agregado correctamente el producto al carrito', productData.result)
+        return await this.success('Se ha agregado correctamente el producto al carrito', productData)
     }
 
     //CHANGE CART
@@ -78,20 +78,19 @@ export default class CartRepository {
         
         if (!cart.success) return cart
 
-
         const toUpdate = data.map(item => ({
             product: item.product,
             quantity: item.quantity || 1
         }))
 
         const cartUpdateQuery = {
-            query: { _id: cart.result._id },
+            query: { _id: cid },
             update: {
                 $set: {
                     products: toUpdate,
                 },
             },
-            options: { new: true, upsert: true },
+            options: { new: true, upsert: true, method: 'update'},
         }
         const result = await this.dao.updateCart(cartUpdateQuery)
 
@@ -109,13 +108,25 @@ export default class CartRepository {
         const cartUpdateQuery = {
             query: {_id: cid, "products.product": pid},
             update: {$set: {"products.$.quantity": data}},
-            options: {new: true}
+            options: {new: true, method: 'free_quantity'}
         }
 
         const cartModified = await this.dao.updateCart(cartUpdateQuery)
 
         if(!cartModified) return await this.error('No se ha modificado correctamente el carrito', 400)
         else return await this.success('Se ha modificado correctamente el carrito', cartModified)
+    }
+
+    //DELETE CART
+    async deleteCart (id) {
+        const exist = await this.getCartById(id)
+
+        if (!exist.success) return exist
+
+        const cart = await this.dao.deleteCart(id)
+
+        if (cart.deletedCount > 0) return await this.success('Se ha eliminado correctamente el carrito', exist.result)
+        else return await this.error('No se ha eliminado correctamente el carrito', 400)
     }
 
     //DELETE PRODUCT FROM CART
@@ -127,24 +138,12 @@ export default class CartRepository {
         const cartUpdateQuery = {
             query: {_id: cid},
             update: {$pull: {products: {product: pid}}},
-            options: {new: true}
+            options: {new: true, method: 'delete'}
         }
 
         const cartModified = await this.dao.updateCart(cartUpdateQuery)
         
         if(!cartModified) return await this.error('No se ha eliminado correctamente el producto del carrito', 400)
         else return await this.success('Se ha eliminado correctamente el producto del carrito', cartModified)
-    }
-    
-    //DELETE CART
-    async deleteCart (id) {
-        const exist = await this.getCartById(id)
-
-        if (!exist.success) return exist
-
-        const cart = await this.dao.deleteCart(id)
-
-        if (cart.deletedCount > 0) return await this.success('Se ha eliminado correctamente el carrito', exist.result)
-        else return await this.error('No se ha eliminado correctamente el carrito', 400)
     }
 }

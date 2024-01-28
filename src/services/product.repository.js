@@ -57,7 +57,12 @@ export default class ProductRepository {
 
         if (!oldProduct.success) return oldProduct
 
-        const newProduct = await this.dao.updateProduct(id, data)
+        const toUpdate = {
+            query: {_id: id},
+            update: {$set: data},
+            options: {new: true}
+        }
+        const newProduct = await this.dao.updateProduct(toUpdate)
 
         if (!newProduct) return await this.error('No se ha modificado correctamente el producto', 400)
         else return await this.success('Se ha modificado correctamente el producto', newProduct)
@@ -71,8 +76,7 @@ export default class ProductRepository {
 
         const product = await this. dao.deleteProduct(id)
 
-        if (product.deletedCount > 0) return await this.success('Se ha eliminado correctamente el producto', exist)
+        if (product.deletedCount > 0) return await this.success('Se ha eliminado correctamente el producto', exist.result)//LE AGREGAMOS EL .RESULT
         else return await this.error('No se ha eliminado correctamente el producto', 400)
     }
 }
-

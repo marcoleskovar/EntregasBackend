@@ -1,4 +1,5 @@
 import { ProductService } from "../services/service.js"
+import ProductDTO from "../dto/file/product.dto.js"
 
 const service = ProductService
 
@@ -36,7 +37,9 @@ export const getProductById = async (req, res) => {//CHECK
 export const createProduct = async (req, res) => {//CHECK
     try {
         const data = req.body
-        const result = await service.createProduct(data)
+        const dto = new ProductDTO(data)
+
+        const result = await service.createProduct(dto)
 
         if (!result.success) return res.status(result.status).json(result)
         else return res.status(200).json(result)

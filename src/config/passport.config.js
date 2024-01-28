@@ -1,6 +1,7 @@
 import passport from 'passport'
 import local from 'passport-local'
 import GitHubStrategy from 'passport-github2'
+import UserDTO from '../dto/file/user.dto.js'
 import { createHash, validateUser, existUser, rol, validatePassword } from '../utils.js'
 import { UserService, CartService } from '../services/service.js'
 
@@ -17,8 +18,8 @@ const initPassport = () => {
                 return done ('EMPTY FIELDS', false)
             }
             const exist = await existUser(username, emailParam)
-            if(!exist.success){
-                return done (exist.tryError, false)
+            if(exist.success){
+                return done (exist, false)
             }else{
                 const wichRol = await rol(emailParam, password)
                 const cartId = await CartService.createCart()
@@ -31,9 +32,10 @@ const initPassport = () => {
                     age,
                     gender,
                     role: wichRol,
-                    cart: cartId.result._id
+                    cart: cartId.result._id || cartId.result.id
                 }
-                const result = await UserService.createUser(newUser)
+                const userDTO = new UserDTO(newUser)
+                const result = await UserService.createUser(userDTO)
                 return done (null, result.result)
             }   
         }
@@ -66,7 +68,7 @@ const initPassport = () => {
         callbackURL: 'http://127.0.0.1:8080/session/githubcallback'
     }, async (accessToken, refreshToken, profile, done) => {
         try {
-            const user = await UserService.getUserByEmail(profile._json.email)
+            const user = await UserService.getByEmail(profile._json.email)
             if(user.success){
                 return done (null, user.result)
             }else{
@@ -77,12 +79,13 @@ const initPassport = () => {
                     email: profile._json.email,
                     username: `${profile._json.email}_username`,
                     password: `${profile._json.email}_password`,
-                    age: 0,
+                    age: 1,
                     gender: 'undefined',
                     role: 'gitHub-user',
                     cart: cartId.result._id
                 }
-                const result = await UserService.createUser(newUser)
+                const userDTO = new UserDTO(newUser)
+                const result = await UserService.createUser(userDTO)
                 return done (null, result.result)
             }
         }
@@ -92,11 +95,11 @@ const initPassport = () => {
     }))
 
     passport.serializeUser((user, done) => {
-        done (null, user._id)
+        done (null, user._id || user.id)
     })
 
     passport.deserializeUser(async(id, done) => {
-        const user = await UserService.getUserById(id)
+        const user = await UserService.getById(id)
         done (null, user.result)
     })
 }
