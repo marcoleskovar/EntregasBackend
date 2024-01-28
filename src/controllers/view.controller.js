@@ -24,8 +24,6 @@ export const productsView = async (req, res) => {
     try {
         const user = req.session.user
         const result = await ProductService.queryParams(req)
-        console.log('Pagination Options:', req.query)
-        console.log('Result Docs:', result.docs);
         res.render('products', {result, user})
     }
     catch (e) {

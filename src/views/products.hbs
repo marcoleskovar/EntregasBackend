@@ -7,8 +7,14 @@
     <hr>
     <section>
         <ul>
-            <li>Total Docs: {{result.totalDocs}}</li>
-            <li>Total Pages: {{result.totalPages}}</li>
+            {{#if result.totalDocs}}
+                <li>Total Docs: {{result.totalDocs}}</li>
+                {{else}}
+            {{/if}}
+            {{#if result.totalPages}}
+                <li>Total Pages: {{result.totalPages}}</li>{{result.totalDocs}}
+                {{else}}
+            {{/if}} 
             {{#if result.hasPrevPage }}
                 <li><a href="/products/?page={{result.prevPage}}&limit={{result.limit}}&sort={{result.sort}}">Previous</a></li>
             {{/if}}
@@ -21,14 +27,14 @@
     {{#each result.docs}}
         <div>
             <h2>{{this.title}}</h2>
-            <h4>Id: {{this._id}}</h4>
+            <h4>Id: {{#if this._id}}{{this._id}}{{else}}{{this.id}}{{/if}}</h4>
             <h4>Precio: {{this.price}}</h4>
             <h4>Category: {{this.category}}</h4>
             <h4>Stock: {{this.stock}}</h4>
             <h4>descripcion: {{this.description}}</h4>
             <h4>Code: {{this.code}}</h4>
         </div>
-        <button class="addToCart" data-product-id='{{this._id}}'>Agregar Al carrito</button>
+        <button class="addToCart" data-product-id='{{#if this._id}}{{this._id}}{{else}}{{this.id}}{{/if}}'>Agregar Al carrito</button>
         <hr>
     {{/each}}
 </section>

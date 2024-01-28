@@ -127,8 +127,8 @@ class ProductManager{
     }
 
     paginateProducts = async () => {
-        const products = await this.getProducts()
-        return products
+        const docs = await this.getProducts()
+        return { docs }
     }
 }
 

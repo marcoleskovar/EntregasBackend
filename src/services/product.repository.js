@@ -89,7 +89,6 @@ export default class ProductRepository {
         console.log('Pagination Options:', query);
         const paginate = await this.dao.paginateProducts (query)
         console.log('paginate', paginate);
-        paginate.docs = paginate.docs.map(doc => doc.toJSON())
         return paginate
     }
 }
