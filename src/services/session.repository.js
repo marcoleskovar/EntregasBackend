@@ -15,7 +15,6 @@ class ViewsServices {
                 lean: true
         })
         result.sort = sort
-
         return result
     }
 

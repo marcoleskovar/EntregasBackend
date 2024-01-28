@@ -86,9 +86,7 @@ export default class ProductRepository {
 
     async queryParams (req) {
         const query = await this.views.queryParams(req)
-        console.log('Pagination Options:', query);
-        const paginate = await this.dao.paginateProducts (query)
-        console.log('paginate', paginate);
+        const paginate = await this.dao.paginateProducts ({options: query})
         return paginate
     }
 }

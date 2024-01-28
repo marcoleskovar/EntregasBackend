@@ -8,8 +8,11 @@ export default class Product {
     async updateProduct ({query, update, options}) {return this.model.findOneAndUpdate(query, update, options)}
     async deleteProduct (id) {return this.model.deleteOne({_id: id})}//CHECK
     async paginateProducts ({options}) {
-        const paginate = await this.model.paginate(options)
-        paginate.docs = paginate.docs.map(doc => doc.toJSON())
+        const sortString = options.sort
+        options.sort = options.sort === 'asc' ? { price: 1 } : (options.sort === 'des' ? { price: -1 } : {})
+        const paginate = await this.model.paginate({}, options)
+        paginate.sort = sortString
+        
         return paginate
     }
 }
