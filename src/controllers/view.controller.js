@@ -1,22 +1,28 @@
-import ViewsServices from "../services/session.repository.js"
 import { ProductService } from "../services/service.js"
+import ViewsManager from "../dao/file/managers/ViewsManager.js"
 
-const view = new ViewsServices()
+const manager = new ViewsManager()
 
 export const auth = (req, res, next) => {
     if (req.session?.user) return next()
     res.redirect('/session/login')
 }
 
+const controllerError = async (e) => {
+    const result = {success: false, area: 'Views-Controller', catchError: e.message, detail: e}
+    return result
+}
+
 
 export const homeView = async (req, res) => {
     try {
-        const paginate = await view.queryParams(req)
-        const home = await view.homeView(paginate)
-        if (home.success) return res.render('home', {})
+        const result = await ProductService.queryParams(req)
+        const home = await manager.homeView(result)
+        if (home.success) return res.json(home)
     }
-    catch (e) {
-        return res.status(500).json({success: false, area: 'Controller', catchError: e.message, detail: e})
+    catch (error) {
+        const err = await controllerError(error)
+        return res.status(500).json(err)
     }
 }
 
@@ -26,18 +32,20 @@ export const productsView = async (req, res) => {
         const result = await ProductService.queryParams(req)
         res.render('products', {result, user})
     }
-    catch (e) {
-        return res.status(500).json({success: false, area: 'Controller', catchError: e.message, detail: e})
+    catch (error) {
+        const err = await controllerError(error)
+        return res.status(500).json(err)
     }
 }
 
 export const realTimeProductsView = async (req, res) => {
     try {
-        const result = await view.queryParams(req)
+        const result = await ProductService.queryParams(req)
         res.render('realTimeProducts', result)
     }
-    catch (e) {
-        return res.status(500).json({success: false, area: 'Controller', catchError: e.message, detail: e})
+    catch (error) {
+        const err = await controllerError(error)
+        return res.status(500).json(err)
     }
 }
 
@@ -46,8 +54,9 @@ export const profileView = async (req, res) => {
         const user = req.session.user
         res.render('profile', user)
     }
-    catch (e) {
-        return res.status(500).json({success: false, area: 'Controller', catchError: e.message, detail: e})
+    catch (error) {
+        const err = await controllerError(error)
+        return res.status(500).json(err)
     }
 }
 

@@ -13,7 +13,7 @@ export default class ViewsManager {
         return result
     }
 
-    /* async homeView (pag) {
+    async homeView (pag) {
         const res = pag
         const prevPage = res.prevPage
         const nextPage = res.nextPage
@@ -34,5 +34,5 @@ export default class ViewsManager {
                 nextLink: hasNextPage ? `/?page=${nextPage}` : null
             }
         }
-    } */
+    }
 }
