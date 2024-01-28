@@ -1,6 +1,5 @@
 //IMPORT TOOLS
 import express from 'express'
-/* import mongoose from 'mongoose' */
 import handlebars from 'express-handlebars'
 import __dirname from './utils.js'
 import { Server } from 'socket.io'
@@ -9,7 +8,6 @@ import MongoStore from 'connect-mongo'
 import passport from 'passport'
 import initPassport from './config/passport.config.js'
 import config from './config/config.js'
-/* import dotenv from 'dotenv' */
 
 //IMPORT ROUTERS
 import productsRouter from './routers/product.router.js'
@@ -20,13 +18,8 @@ import viewsRouter from './routers/router.views.js'
 import chatRouter from './routers/chat.router.js'
  */
 
-//ENV
-/* dotenv.config() */
-
 //DEFINING CONSTANTS
 const app = express()
-/* const mongoURL = process.env.MONGO_URL
-const mongoName = process.env.DB_NAME */
 
 //CREATING SESSION
 app.use(session({
@@ -48,6 +41,7 @@ app.use(passport.session())
 app.engine('hbs', handlebars.engine())
 app.set('views', __dirname + '/views')
 app.set('view engine', 'hbs')
+handlebars.allowProtoMethodsByDefault = true
 
 //USE JSON
 app.use(express.json())
@@ -66,26 +60,15 @@ app.use('/chat', chatRouter)
 */
 
 //LISTEN
-app.listen(config.port, () => console.log('RUNNING...'))
-
-/* mongoose.connect(mongoURL, {dbName: mongoName})
-    .then(() => {
-        //TO CHECK socket
-        console.log('DB CONNECTED')
+const httpServer = app.listen(config.port, () => console.log('RUNNING...'))
+const io = new Server(httpServer)
+io.on('connection', socket => {
+    console.log('Nuevo cliente conectado')
+    
+    socket.on('newList', async products => {
+        io.emit('updatedProducts', products)
     })
-    .catch(e => console.log(e))
-    .finally(() => {
-        const PORT = process.env.PORT || 8080
-        const httpServer = app.listen(PORT, () => console.log('RUNNING...'))
-        const io = new Server(httpServer)
-        io.on('connection', socket => {
-            console.log('Nuevo cliente conectado')
-            
-            socket.on('newList', async products => {
-                io.emit('updatedProducts', products)
-            })
-            socket.on('message', async data => {
-                socket.emit('chat', data)
-            })
-        })
-    }) */
+    socket.on('message', async data => {
+        socket.emit('chat', data)
+    })
+})

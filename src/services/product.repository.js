@@ -1,6 +1,10 @@
+import ViewsManager from "../dao/file/managers/ViewsManager.js"
+import ProductsModel from "../dao/models/product.model.js"
+
 export default class ProductRepository {
     constructor (dao) {
         this.dao = dao
+        this.views = new ViewsManager()
     }
 
     //IF SUCCESS
@@ -78,5 +82,14 @@ export default class ProductRepository {
 
         if (product.deletedCount > 0) return await this.success('Se ha eliminado correctamente el producto', exist.result)//LE AGREGAMOS EL .RESULT
         else return await this.error('No se ha eliminado correctamente el producto', 400)
+    }
+
+    async queryParams (req) {
+        const query = await this.views.queryParams(req)
+        console.log('Pagination Options:', query);
+        const paginate = await this.dao.paginateProducts (query)
+        console.log('paginate', paginate);
+        paginate.docs = paginate.docs.map(doc => doc.toJSON())
+        return paginate
     }
 }

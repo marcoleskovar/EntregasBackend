@@ -125,6 +125,11 @@ class ProductManager{
         if (write === undefined) return {deletedCount: 1}
         else return {deletedCount: -1}
     }
+
+    paginateProducts = async () => {
+        const products = await this.getProducts()
+        return products
+    }
 }
 
 export default ProductManager

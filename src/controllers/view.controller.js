@@ -1,4 +1,5 @@
 import ViewsServices from "../services/session.repository.js"
+import { ProductService } from "../services/service.js"
 
 const view = new ViewsServices()
 
@@ -22,7 +23,9 @@ export const homeView = async (req, res) => {
 export const productsView = async (req, res) => {
     try {
         const user = req.session.user
-        const result = await view.queryParams(req)
+        const result = await ProductService.queryParams(req)
+        console.log('Pagination Options:', req.query)
+        console.log('Result Docs:', result.docs);
         res.render('products', {result, user})
     }
     catch (e) {

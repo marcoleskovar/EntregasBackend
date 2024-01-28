@@ -7,4 +7,5 @@ export default class Product {
     async createProduct (data) {return this.model.create(data)}//CHECK
     async updateProduct ({query, update, options}) {return this.model.findOneAndUpdate(query, update, options)}
     async deleteProduct (id) {return this.model.deleteOne({_id: id})}//CHECK
+    async paginateProducts ({options}) {return this.model.paginate(options)}
 }
