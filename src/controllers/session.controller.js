@@ -1,3 +1,5 @@
+import CurrentDTO from "../dto/file/current.dto.js"
+
 export const getLogin = (req, res) => {
     res.render('login', {})
 }
@@ -18,7 +20,10 @@ export const getGithubError = (req, res) => {
 }
 
 export const getCurrent = (req, res) => {
-    if(req.session?.user) return res.send(req.session.user)
+    if(req.session?.user){
+        const user = new CurrentDTO(req.session.user)
+        return res.send(user)
+    }
     else res.redirect('/session/login')
 }
 
