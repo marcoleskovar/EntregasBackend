@@ -1,26 +1,14 @@
 [
   {
     "id": 1,
-    "name": "1",
-    "lastname": "1",
-    "email": "1@1.com",
-    "username": "1",
-    "password": "$2b$10$78irxpsxOgrzExXGKoxVrOaB3Y5zBnk9i490yDBTdORlsiMY.6LYW",
-    "age": "1",
+    "name": "ADMIN",
+    "lastname": "CODERHOUSE",
+    "email": "adminCoder@coder.com",
+    "username": "admin",
+    "password": "$2b$10$PmFTbkazs/XBIFGHB.L/qezVD/JwM6btkpEu.MIjAsdn5mxwRW3AK",
+    "age": "999",
     "gender": "Male",
-    "role": "user",
-    "cart": 3
-  },
-  {
-    "id": 2,
-    "name": "2",
-    "lastname": "2",
-    "email": "2@2.com",
-    "username": "2",
-    "password": "$2b$10$PfUYYGItSxBKzlVJPg8WIeIFAmUYRS3fQk5qSzaoVczAVf68q9NAa",
-    "age": "2",
-    "gender": "Male",
-    "role": "user",
-    "cart": 4
+    "role": "admin",
+    "cart": 1
   }
 ]

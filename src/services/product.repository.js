@@ -1,5 +1,4 @@
 import ViewsManager from "../dao/file/managers/ViewsManager.js"
-import ProductsModel from "../dao/models/product.model.js"
 
 export default class ProductRepository {
     constructor (dao) {

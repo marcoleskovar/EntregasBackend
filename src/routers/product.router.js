@@ -1,16 +1,17 @@
 import { Router } from 'express'
 import { getProducts, getProductById, createProduct, updateProduct, deleteProduct } from '../controllers/product.controller.js'
+import {auth, authRole} from '../utils.js'
 
 const router = Router()
 
-router.get('/', getProducts)
+router.get('/', auth, getProducts)
 
-router.get('/:pid', getProductById)
+router.get('/:pid', auth, getProductById)
 
-router.post('/', createProduct)
+router.post('/', auth, authRole('admin'), createProduct)
 
-router.put('/:pid', updateProduct)
+router.put('/:pid', auth, authRole('admin'), updateProduct)
 
-router.delete('/:pid', deleteProduct)
+router.delete('/:pid', auth, authRole('admin'), deleteProduct)
 
 export default router
