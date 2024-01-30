@@ -1,4 +1,4 @@
-import ProductsModel from "../models/product.model.js"
+import ProductsModel from "./models/product.model.js"
 
 export default class Product {
     constructor () {this.model = ProductsModel}

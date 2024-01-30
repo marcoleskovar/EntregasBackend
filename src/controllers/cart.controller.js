@@ -33,6 +33,22 @@ export const getCartById = async (req, res) => {//CHECK
     }
 }
 
+export const cartView = async (req, res) => {
+    try {
+        const cid = req.session.user.cart
+        const result = await service.getCartById(cid)
+        if (!result.success) return res.status(result.status).json(result)
+        else {
+            const products = result.result.products
+            return res.render('cart', {products, cid})
+        }
+    }
+    catch (error) {
+        const err = await controllerError(error)
+        return res.status(500).json(err)
+    }
+}
+
 export const createCart = async (req, res) => {//CHECK
     try {
         const data = req.body
@@ -138,6 +154,35 @@ export const deleteCart = async (req, res) => {//CHECK
 
         if (!result.success) return res.status(result.status).json(result)
         else return res.status(200).json(result)
+    } catch (error) {
+        const err = await controllerError(error)
+        return res.status(500).json(err)
+    }
+}
+
+export const purchaseCart = async (req, res) => {
+    try {
+        const cid = req.params.cid
+        const validProds = []
+        const rejectedProds = []
+        const cart = await service.getCartById(cid)
+        if (cid === req.session.user.cart) {
+            const valid = await service.validToPurchase(cid)
+            valid.map(async d => {
+                if (d.success) {
+                    validProds.push(d.result)
+                }
+                else {
+                    rejectedProds.push(d.tryError)}
+            })
+            if (validProds.length === 0) return res.redirect(`/api/carts/${cart}`)//NO FUNCIONA
+            const result = await service.purchaseCart(cid, validProds, req.session.user.email)
+            if (!result.success) return res.status(result.status).send(result)
+            else {
+                if (rejectedProds.length !== 0) return res.json(cart)
+                else return res.redirect('/api/products')//NO FUNCIONA
+            }
+        }
     } catch (error) {
         const err = await controllerError(error)
         return res.status(500).json(err)

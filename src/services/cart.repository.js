@@ -1,3 +1,5 @@
+import moment from "moment"
+
 export default class CartRepository {
     constructor (dao) {
         this.dao = dao
@@ -112,7 +114,6 @@ export default class CartRepository {
         }
 
         const cartModified = await this.dao.updateCart(cartUpdateQuery)
-
         if(!cartModified) return await this.error('No se ha modificado correctamente el carrito', 400)
         else return await this.success('Se ha modificado correctamente el carrito', cartModified)
     }
@@ -145,5 +146,41 @@ export default class CartRepository {
         
         if(!cartModified) return await this.error('No se ha eliminado correctamente el producto del carrito', 400)
         else return await this.success('Se ha eliminado correctamente el producto del carrito', cartModified)
+    }
+
+    //PURCHASE CART
+    async validToPurchase (cid) {
+        const cart = await this.getCartById(cid)
+
+        if (!cart.success) return cart
+
+        const result = await Promise.all (cart.result.products.map(async (p) => {
+            const stock = p.product.stock
+            const quantity = p.quantity
+            
+            if (stock >= quantity) return await this.success('Stock mayor a cantidad', p)
+            else return await this.error(p, 400)
+        }))
+        return result
+    }
+
+    async purchaseCart (cid, data, user) {
+        const newTicket = {
+            code: Math.random().toString(32).substring(7),
+            purchase_datetime: moment().format("DD-MM-YYYY - hh:mm a"),
+            amount: data.reduce((acumulator, product) => {  
+                return acumulator + (product.product.price) * product.quantity
+            }, 0),
+            purchaser: user
+        }
+        const purchase = await this.dao.purchaseCart(newTicket)
+        if (purchase) {
+            data.map(async p => {
+                const deleteFunc = await this.deleteProdCart(cid, p.product._id || p.product.id)
+                if (!deleteFunc.success) return deleteFunc
+            })
+            return await this.success('Compra realizada con exito', purchase)
+        }
+        else return await this.error('No se ha creado el ticket', 500)
     }
 }

@@ -1,0 +1,14 @@
+<h1>Carrito:</h1>
+<hr>
+<section id="productList">
+    {{#each products}}
+        <div>
+            <h4>{{this.product.title}} - ({{this.quantity}})</h4>
+            <h5>{{this.product.description}}</h5>
+            <h2>${{this.product.price}}</h2>
+        </div>
+        <hr>
+    {{/each}}
+    <button id="buyCart"  data-cart-id='{{cid}}'>Comprar Carrito</button>
+</section>
+<script src="/static/js/cart.js"></script>

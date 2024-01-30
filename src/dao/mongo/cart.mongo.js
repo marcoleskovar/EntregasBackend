@@ -1,4 +1,5 @@
-import CartModel from "../models/cart.model.js"
+import CartModel from "./models/cart.model.js"
+import TicketModel from "./models/ticket.model.js"
 
 export default class Cart {
     constructor () {this.model = CartModel}
@@ -7,4 +8,5 @@ export default class Cart {
     async createCart (data) {return this.model.create(data)}
     async updateCart ({ query, update, options }) {return this.model.findOneAndUpdate(query, update, options)}
     async deleteCart (id) {return this.model.deleteOne({_id: id})}
+    async purchaseCart (data) {return TicketModel.create(data)}
 }

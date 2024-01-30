@@ -1,15 +1,9 @@
-const socket = io()
+const button = document.getElementById('buyCart')
 
-const addToCart = document.querySelectorAll('.addToCart')
+button.onclick = async () => {
+    const cartID = button.dataset.cartId
 
-addToCart.forEach(button => {
-    button.onclick = async () => {
-        const welcomeMessage = document.getElementById('welcome')
-        const cartID = welcomeMessage.dataset.cartId
-        const productID = await button.dataset.productId
-
-        await fetch(`/api/carts/${cartID}/products/${productID}`, {
-            method: 'POST'
-        })
-    }
-})
+    await fetch(`/api/carts/${cartID}/purchase`, {
+        method: 'POST'
+    })
+}
