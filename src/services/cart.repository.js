@@ -1,4 +1,5 @@
 import moment from "moment"
+import { ProductService } from "./service.js"
 
 export default class CartRepository {
     constructor (dao) {
@@ -165,10 +166,16 @@ export default class CartRepository {
     }
 
     async purchaseCart (cid, data, user) {
+        const prod = []
+        data.map(d => {
+            prod.push({product: d.product.title, price: d.product.price, quantity: d.quantity, subtotal: (d.product.price *  d.quantity)})
+        })
+
         const newTicket = {
             code: Math.random().toString(32).substring(7),
             purchase_datetime: moment().format("DD-MM-YYYY - hh:mm a"),
-            amount: data.reduce((acumulator, product) => {  
+            products: prod,
+            totalAmount: data.reduce((acumulator, product) => {  
                 return acumulator + (product.product.price) * product.quantity
             }, 0),
             purchaser: user
@@ -176,7 +183,14 @@ export default class CartRepository {
         const purchase = await this.dao.purchaseCart(newTicket)
         if (purchase) {
             data.map(async p => {
+                const pid = p.product._id || p.product.id
+                const newStock = (p.product.stock - p.quantity)
+                const updateStock = await ProductService.updateProduct(pid, {stock: newStock})
+
+                if (!updateStock.success) return updateStock
+
                 const deleteFunc = await this.deleteProdCart(cid, p.product._id || p.product.id)
+
                 if (!deleteFunc.success) return deleteFunc
             })
             return await this.success('Compra realizada con exito', purchase)

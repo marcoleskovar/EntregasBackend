@@ -10,5 +10,17 @@
     "gender": "Male",
     "role": "admin",
     "cart": 1
+  },
+  {
+    "id": 2,
+    "name": "Marco",
+    "lastname": "Leskovar",
+    "email": "leskovarmarco@gmail.com",
+    "username": "marcolesk",
+    "password": "$2b$10$HsLcA4SM0GYVkwwinlm59.htesBhv52h1wnuW1C2zG8e3fnMHbDaK",
+    "age": "19",
+    "gender": "Male",
+    "role": "user",
+    "cart": 2
   }
 ]

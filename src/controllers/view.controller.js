@@ -1,4 +1,4 @@
-import { ProductService } from "../services/service.js"
+import { ProductService, CartService } from "../services/service.js"
 import ViewsManager from "../dao/file/managers/ViewsManager.js"
 
 const manager = new ViewsManager()
@@ -43,6 +43,23 @@ export const realTimeProductsView = async (req, res) => {
         return res.status(500).json(err)
     }
 }
+
+export const cartView = async (req, res) => {
+    try {
+        const cid = req.session.user.cart
+        const result = await CartService.getCartById(cid)
+        if (!result.success) return res.status(result.status).json(result)
+        else {
+            const products = result.result.products
+            return res.render('cart', {products, cid})
+        }
+    }
+    catch (error) {
+        const err = await controllerError(error)
+        return res.status(500).json(err)
+    }
+}
+
 
 export const profileView = async (req, res) => {
     try {

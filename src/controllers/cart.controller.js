@@ -33,22 +33,6 @@ export const getCartById = async (req, res) => {//CHECK
     }
 }
 
-export const cartView = async (req, res) => {
-    try {
-        const cid = req.session.user.cart
-        const result = await service.getCartById(cid)
-        if (!result.success) return res.status(result.status).json(result)
-        else {
-            const products = result.result.products
-            return res.render('cart', {products, cid})
-        }
-    }
-    catch (error) {
-        const err = await controllerError(error)
-        return res.status(500).json(err)
-    }
-}
-
 export const createCart = async (req, res) => {//CHECK
     try {
         const data = req.body
@@ -176,6 +160,7 @@ export const purchaseCart = async (req, res) => {
                     rejectedProds.push(d.tryError)}
             })
             if (validProds.length === 0) return res.redirect(`/api/carts/${cart}`)//NO FUNCIONA
+            console.log(validProds)
             const result = await service.purchaseCart(cid, validProds, req.session.user.email)
             if (!result.success) return res.status(result.status).send(result)
             else {
