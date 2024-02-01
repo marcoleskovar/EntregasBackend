@@ -149,52 +149,69 @@ export default class CartRepository {
         else return await this.success('Se ha eliminado correctamente el producto del carrito', cartModified)
     }
 
-    //PURCHASE CART
-    async validToPurchase (cid) {
+    async purchaseCart (cid, user) {
         const cart = await this.getCartById(cid)
 
         if (!cart.success) return cart
 
-        const result = await Promise.all (cart.result.products.map(async (p) => {
+        const validProds = []
+        const rejectedProds = []
+        const prodInfo = []
+        const code = Math.random().toString(32).substring(7)
+        const purchase_datetime = moment().format("DD-MM-YYYY - hh:mm a")
+        const purchaser = user
+
+        for (const p of cart.result.products) {
             const stock = p.product.stock
             const quantity = p.quantity
             
-            if (stock >= quantity) return await this.success('Stock mayor a cantidad', p)
-            else return await this.error(p, 400)
-        }))
-        return result
-    }
-
-    async purchaseCart (cid, data, user) {
-        const prod = []
-        data.map(d => {
-            prod.push({product: d.product.title, price: d.product.price, quantity: d.quantity, subtotal: (d.product.price *  d.quantity)})
-        })
-
-        const newTicket = {
-            code: Math.random().toString(32).substring(7),
-            purchase_datetime: moment().format("DD-MM-YYYY - hh:mm a"),
-            products: prod,
-            totalAmount: data.reduce((acumulator, product) => {  
-                return acumulator + (product.product.price) * product.quantity
-            }, 0),
-            purchaser: user
+            if (stock >= quantity) {
+                validProds.push(p)
+                prodInfo.push({product: p.product.title, price: p.product.price, quantity: p.quantity, subtotal: (p.product.price *  p.quantity)})
+            }else {
+                rejectedProds.push(p)
+            }
         }
-        const purchase = await this.dao.purchaseCart(newTicket)
-        if (purchase) {
-            data.map(async p => {
-                const pid = p.product._id || p.product.id
-                const newStock = (p.product.stock - p.quantity)
-                const updateStock = await ProductService.updateProduct(pid, {stock: newStock})
 
-                if (!updateStock.success) return updateStock
+        if (validProds.length !== 0) {
+            const ticket = {
+                code,
+                purchase_datetime,
+                products: prodInfo,
+                totalAmount: validProds.reduce((acumulator, prod) => {  
+                    return acumulator + (prod.product.price) * prod.quantity
+                }, 0),
+                purchaser
+            }
+    
+            const purchase = await this.dao.purchaseCart(ticket)
+            if (purchase) {
+                const updateProcess = validProds.map( async (p) => {
+                    const newStock = (p.product.stock - p.quantity)
+                    const updateStock = await ProductService.updateProduct(p.product._id || p.product.id, {stock: newStock})
+                    return updateStock
+                })
+                const updateResult = await Promise.all(updateProcess)
 
-                const deleteFunc = await this.deleteProdCart(cid, p.product._id || p.product.id)
+                const deleteProcess = validProds.map(async (p, index) => {
+                    if (updateResult[index].success) {
+                        const deleteFunc = await this.deleteProdCart(cid, p.product._id || p.product.id)
+                        return deleteFunc
+                    } else {
+                        return updateResult[index]
+                    }
+                })
+                const deleteResults = await Promise.all(deleteProcess)
 
-                if (!deleteFunc.success) return deleteFunc
-            })
-            return await this.success('Compra realizada con exito', purchase)
+                const successResults = deleteResults.filter(result => result && result.success)
+                
+                if (successResults.length === validProds.length) return this.success('Se ha comprado correctamente el carrito', purchase)
+                else return this.error('Hubo un problema en algunas operaciones', 500)
+            }else {
+                return await this.error('No se ha podido hacer la compra', 500)
+            }
+        }else {
+            return await this.success ('No hay productos validos, modifica sus quantitys', 'notValid')
         }
-        else return await this.error('No se ha creado el ticket', 500)
     }
 }

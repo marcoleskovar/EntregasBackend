@@ -147,25 +147,14 @@ export const deleteCart = async (req, res) => {//CHECK
 export const purchaseCart = async (req, res) => {
     try {
         const cid = req.params.cid
-        const validProds = []
-        const rejectedProds = []
-        const cart = await service.getCartById(cid)
+        const cart = await service.getCartById(cid)//
         if (cid === req.session.user.cart) {
-            const valid = await service.validToPurchase(cid)
-            valid.map(async d => {
-                if (d.success) {
-                    validProds.push(d.result)
-                }
-                else {
-                    rejectedProds.push(d.tryError)}
-            })
-            if (validProds.length === 0) return res.redirect(`/api/carts/${cart}`)//NO FUNCIONA
-            console.log(validProds)
-            const result = await service.purchaseCart(cid, validProds, req.session.user.email)
-            if (!result.success) return res.status(result.status).send(result)
-            else {
-                if (rejectedProds.length !== 0) return res.json(cart)
-                else return res.redirect('/api/products')//NO FUNCIONA
+            const result = await service.purchaseCart(cid, req.session.user.email)
+            if (!result.success){
+                return res.status(result.status).send(result)
+            }else {
+                if (result.result === 'notValid') return res.redirect(`/api/carts/${cid}`)
+                else res.redirect('/products')
             }
         }
     } catch (error) {
