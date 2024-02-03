@@ -148,13 +148,18 @@ export const purchaseCart = async (req, res) => {
     try {
         const cid = req.params.cid
         const cart = await service.getCartById(cid)//
+        console.log('funcion')
         if (cid === req.session.user.cart) {
+            console.log('ENTRA A LA FUNCION')
             const result = await service.purchaseCart(cid, req.session.user.email)
+            console.log(result)
             if (!result.success){
-                return res.status(result.status).send(result)
-            }else {
-                if (result.result === 'notValid') return res.redirect(`/api/carts/${cid}`)
-                else res.redirect('/products')
+                if (result.tryError === 'Not Valid Products') res.redirect(`/api/carts/${cid}`)
+                else return res.status(result.status).send(result)
+            }
+            else {
+                console.log('LLEGO SUCCESFULLY');
+                return res.json({status: 'success'})//no funciona!
             }
         }
     } catch (error) {

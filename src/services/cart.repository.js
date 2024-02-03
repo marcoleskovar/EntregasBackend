@@ -150,33 +150,24 @@ export default class CartRepository {
     }
 
     async purchaseCart (cid, user) {
+        console.log('1');
         const cart = await this.getCartById(cid)
 
         if (!cart.success) return cart
-
-        const validProds = []
-        const rejectedProds = []
+        console.log('2');
         const prodInfo = []
-        const code = Math.random().toString(32).substring(7)
-        const purchase_datetime = moment().format("DD-MM-YYYY - hh:mm a")
         const purchaser = user
 
-        for (const p of cart.result.products) {
-            const stock = p.product.stock
-            const quantity = p.quantity
-            
-            if (stock >= quantity) {
-                validProds.push(p)
+        const validProds = cart.result.products.filter(p => {
+            if (p.product.stock >= p.quantity){
                 prodInfo.push({product: p.product.title, price: p.product.price, quantity: p.quantity, subtotal: (p.product.price *  p.quantity)})
-            }else {
-                rejectedProds.push(p)
+                return p
             }
-        }
-
+        })
+        console.log('3');
         if (validProds.length !== 0) {
+            console.log('4');
             const ticket = {
-                code,
-                purchase_datetime,
                 products: prodInfo,
                 totalAmount: validProds.reduce((acumulator, prod) => {  
                     return acumulator + (prod.product.price) * prod.quantity
@@ -186,32 +177,29 @@ export default class CartRepository {
     
             const purchase = await this.dao.purchaseCart(ticket)
             if (purchase) {
-                const updateProcess = validProds.map( async (p) => {
-                    const newStock = (p.product.stock - p.quantity)
-                    const updateStock = await ProductService.updateProduct(p.product._id || p.product.id, {stock: newStock})
-                    return updateStock
-                })
-                const updateResult = await Promise.all(updateProcess)
+                console.log('5')
+                const updateStock = await Promise.all(validProds.map(async p => {
+                    return await ProductService.updateProduct(p.product._id || p.product.id, { stock: p.product.stock - p.quantity })
+                }))
+                console.log('6')
 
-                const deleteProcess = validProds.map(async (p, index) => {
-                    if (updateResult[index].success) {
-                        const deleteFunc = await this.deleteProdCart(cid, p.product._id || p.product.id)
-                        return deleteFunc
-                    } else {
-                        return updateResult[index]
-                    }
-                })
-                const deleteResults = await Promise.all(deleteProcess)
+                for (const p of updateStock) {
+                    console.log('xd')
+                    if (!p.success) return await this.error('No se ha actualizado el producto', 500);
+                    
+                    const deleted = await this.deleteProdCart(cid, p.result._id || p.result.id)
 
-                const successResults = deleteResults.filter(result => result && result.success)
-                
-                if (successResults.length === validProds.length) return this.success('Se ha comprado correctamente el carrito', purchase)
-                else return this.error('Hubo un problema en algunas operaciones', 500)
+                    if (!deleted.success) return await this.error('No se ha borrado del carrito', 500)
+                }
+                console.log('8')
+                return await this.success ('Se ha borrado del carrito correctamente', 'All good')
             }else {
+                console.log('9')
                 return await this.error('No se ha podido hacer la compra', 500)
             }
         }else {
-            return await this.success ('No hay productos validos, modifica sus quantitys', 'notValid')
+            console.log('10')
+            return await this.error ('Not Valid Products', 400)
         }
     }
 }
