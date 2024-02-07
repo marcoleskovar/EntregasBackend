@@ -150,23 +150,19 @@ export default class CartRepository {
     }
 
     async purchaseCart (cid, user) {
-        console.log('1');
         const cart = await this.getCartById(cid)
-
         if (!cart.success) return cart
-        console.log('2');
+
         const prodInfo = []
         const purchaser = user
-
         const validProds = cart.result.products.filter(p => {
             if (p.product.stock >= p.quantity){
                 prodInfo.push({product: p.product.title, price: p.product.price, quantity: p.quantity, subtotal: (p.product.price *  p.quantity)})
                 return p
             }
         })
-        console.log('3');
+
         if (validProds.length !== 0) {
-            console.log('4');
             const ticket = {
                 products: prodInfo,
                 totalAmount: validProds.reduce((acumulator, prod) => {  
@@ -174,31 +170,21 @@ export default class CartRepository {
                 }, 0),
                 purchaser
             }
-    
+
             const purchase = await this.dao.purchaseCart(ticket)
-            if (purchase) {
-                console.log('5')
-                const updateStock = await Promise.all(validProds.map(async p => {
-                    return await ProductService.updateProduct(p.product._id || p.product.id, { stock: p.product.stock - p.quantity })
-                }))
-                console.log('6')
 
-                for (const p of updateStock) {
-                    console.log('xd')
-                    if (!p.success) return await this.error('No se ha actualizado el producto', 500);
-                    
-                    const deleted = await this.deleteProdCart(cid, p.result._id || p.result.id)
+            if (!purchase) return await this.error('No se ha podido hacer la compra', 500)
 
-                    if (!deleted.success) return await this.error('No se ha borrado del carrito', 500)
-                }
-                console.log('8')
-                return await this.success ('Se ha borrado del carrito correctamente', 'All good')
-            }else {
-                console.log('9')
-                return await this.error('No se ha podido hacer la compra', 500)
+            for (const p of await validProds) {
+                const updated =  await ProductService.updateProduct(p.product._id || p.product.id, { stock: p.product.stock - p.quantity })
+                if (!updated.success) return await this.error('No se ha actualizado el producto', 500);
+                
+                const deleted = await this.deleteProdCart(cid, p.product._id || p.product.id)
+                
+                if (!deleted.success) return await this.error('No se ha borrado del carrito', 500)
             }
+            return await this.success ('Se ha borrado del carrito correctamente', 'All good')
         }else {
-            console.log('10')
             return await this.error ('Not Valid Products', 400)
         }
     }

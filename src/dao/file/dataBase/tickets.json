@@ -1,0 +1,38 @@
+[
+  {
+    "id": 1,
+    "code": "b4jn4g",
+    "purchase_datetime": "04-02-2024 - 09:03 pm",
+    "totalAmount": 369,
+    "products": [
+      {
+        "product": "PRODUCTO 1",
+        "price": 69,
+        "quantity": 1,
+        "subtotal": 69
+      },
+      {
+        "product": "PRODUCTO 2",
+        "price": 300,
+        "quantity": 1,
+        "subtotal": 300
+      }
+    ],
+    "purchaser": "leskovarmarco@gmail.com"
+  },
+  {
+    "id": 2,
+    "code": "ghtpgo",
+    "purchase_datetime": "04-02-2024 - 09:05 pm",
+    "totalAmount": 18000,
+    "products": [
+      {
+        "product": "PRODUCTO 13",
+        "price": 9000,
+        "quantity": 2,
+        "subtotal": 18000
+      }
+    ],
+    "purchaser": "leskovarmarco@gmail.com"
+  }
+]

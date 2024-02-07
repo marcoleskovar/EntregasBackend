@@ -14,9 +14,7 @@ import productsRouter from './routers/product.router.js'
 import cartRouter from './routers/cart.router.js'
 import sessionRouter from './routers/session.router.js'
 import viewsRouter from './routers/router.views.js'
-/* 
 import chatRouter from './routers/chat.router.js'
- */
 
 //DEFINING CONSTANTS
 const app = express()
@@ -51,13 +49,11 @@ app.use(express.urlencoded({extended: true}))
 app.use('/static', express.static(__dirname + '/public'))
 
 //ROUTERS
-app.use('/api/products', productsRouter) //CHECK
+app.use('/', viewsRouter)
+app.use('/api/products', productsRouter)
 app.use('/api/carts', cartRouter)
 app.use('/session', sessionRouter) 
-app.use('/', viewsRouter)
-/*
 app.use('/chat', chatRouter)
-*/
 
 //LISTEN
 const httpServer = app.listen(config.port, () => console.log('RUNNING...'))

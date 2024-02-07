@@ -1,10 +1,11 @@
-/* import { Router } from 'express'
-import { getChat, postMessage } from '../controllers/controller.chat.js'
+import { Router } from 'express'
+import { getChat, postChat } from '../controllers/chat.controller.js'
+import { auth, authRole } from '../utils.js'
 
 const router = Router()
 
-router.get('/', getChat)
+router.get('/', auth, authRole('user'), getChat)
 
-router.post('/', postMessage)
+router.post('/', auth, authRole('user'), postChat)
 
-export default router */
+export default router

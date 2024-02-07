@@ -1,20 +1,35 @@
-/* import ChatModel from "../dao/models/chat.model.js"
+class ChatRepository {
+    constructor(dao) {
+        this.dao = dao
+    }
 
-class ChatService {
-    constructor() {
-        this.model = ChatModel
+    //IF SUCCESS
+    async success (message, data) {
+        const result = {success: true, message: message, result: data}
+        return result
+    }
+
+    //IF ERROR
+    async error (message, status) {
+        const result = {success: false, area: 'Chat-Service', tryError: message, status: status}
+        return result
     }
 
     async getChat () {
-        const messages = await this.model.find().lean()
-        return {success: true, chat: messages}
+        const messages = await this.dao.getChat()
+        return await this.success('Se cargaron todos los chats', messages)
     }
 
-    async postMessage (data) {
-        const message = await this.model.create(data)
-        if (!message) return {success: false, area: 'Service', tryError: 'couldnt post message', status: 400}
-        else return {success: true, message: message}
+    async postChat (data, user) {
+        const newMessage = {
+            user,
+            message: data
+        }
+        const message = await this.dao.postChat(newMessage)
+
+        if (!message) return await this.error('Ha ocurrido un error al postear un mensaje', 500)
+        else return await this.success('Se ha creado el mensaje', message)
     }
 }
 
-export default ChatService */
+export default ChatRepository

@@ -22,7 +22,8 @@ const productsSchema = new mongoose.Schema({
     code: {
         type: String,
         required: true,
-        unique: true
+        unique: true,
+        default: Math.random().toString(32).substring(7)
     },
     category: {
         type: String,

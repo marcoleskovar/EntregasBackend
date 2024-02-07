@@ -1,5 +1,6 @@
 import fs from 'fs'
 import ProductManager from './ProductManager.js'
+import TicketDTO from '../../../dto/file/ticket.dto.js'
 
 class CartManager{
     constructor(){
@@ -9,9 +10,9 @@ class CartManager{
         this.prodManager = new ProductManager()
     }
 
-    lastId = async () => {
+    lastId = async (file = this.filename) => {
         try{
-            const list = await this.getCarts()
+            const list = await this.getCarts(file)
             const maxId = list.reduce((max, product) => {
                 return product.id > max ? product.id : max
             }, 0)
@@ -48,18 +49,18 @@ class CartManager{
         return parse
     }
 
-    getCarts = async () => {//GET CARTS
-        if (fs.existsSync(this.filename)){
-            this._products = await this.fileContent(this.filename, this._format)
+    getCarts = async (file = this.filename) => {//GET CARTS
+        if (fs.existsSync(file)){
+            this._products = await this.fileContent(file, this._format)
             return this._products
         }else{
-            await fs.promises.writeFile(this.filename, '[]', this._format)
+            await fs.promises.writeFile(file, '[]', this._format)
             return this._products
         }
     }
 
     getCartById = async (id) => {//GET CART BY ID
-        const list = await this.getCarts()
+        const list = await this.getCarts(this.filename)
         const find = list.findIndex(d => d.id === parseInt(id))
 
         if (find === -1) return null
@@ -79,8 +80,8 @@ class CartManager{
     }
 
     createCart = async (data) => {//CREATE EMPTY CART
-        const list = await this.getCarts()
-        const id = await this.lastId() + 1
+        const list = await this.getCarts(this.filename)
+        const id = await this.lastId(this.filename) + 1
         const pushear = list.push({id, products: []})
 
         if (!pushear) return null
@@ -92,7 +93,7 @@ class CartManager{
     }
 
     addToCart = async (cid, pid) => {//ADD NEW PRODUCT TO CART
-        const list = await this.getCarts()
+        const list = await this.getCarts(this.filename)
         const idx = list.findIndex(d => d.id === parseInt(parseInt(cid)))
         list[idx].products.push({product: pid, quantity: 1})
         const write = await fs.promises.writeFile(this.filename, JSON.stringify(list, null, 2))
@@ -116,7 +117,7 @@ class CartManager{
             return increaseQuant
         }
         else if (key.result === 'update') { //CHANGE WHOLE CART
-            const list = await this.getCarts()
+            const list = await this.getCarts(this.filename)
             const updtInfo = key.content.products
             const idx = list.findIndex(d => d.id === parseInt(parseInt(cid)))
             list[idx].products = updtInfo
@@ -138,7 +139,7 @@ class CartManager{
     }
 
     increaseQuant = async (cid, pid, quant, method) => {
-        const list = await this.getCarts()
+        const list = await this.getCarts(this.filename)
         const idx = list.findIndex(d => d.id === parseInt(parseInt(cid)))
         const product = (list[idx].products.find(p => p.product === parseInt(pid)))
 
@@ -157,7 +158,7 @@ class CartManager{
     }
 
     deleteCart = async (id) => {
-        const list = await this.getCarts()
+        const list = await this.getCarts(this.filename)
         const newCarts = list.filter(d => d.id !== parseInt(id))
 
         const write = await fs.promises.writeFile(this.filename, JSON.stringify(newCarts, null, 2))
@@ -167,7 +168,7 @@ class CartManager{
     }
 
     deleteProdCart = async (cid, pid) => {
-        const list = await this.getCarts()
+        const list = await this.getCarts(this.filename)
         const idx = list.findIndex(d => d.id === parseInt(parseInt(cid)))
         const eliminatedProduct = (list[idx].products.filter(p => p.product === parseInt(pid)))
 
@@ -178,6 +179,26 @@ class CartManager{
     
         if (write === undefined) return eliminatedProduct
         else return  null
+    }
+
+
+    async createTicket (ticket) {
+        const list = await this.getCarts('./dao/file/dataBase/tickets.json')
+        const ticketData = new TicketDTO(ticket)
+        list.push(ticketData)
+
+        const write = await fs.promises.writeFile('./dao/file/dataBase/tickets.json', JSON.stringify(list, null, 2))
+
+        if(write === undefined) return ticketData
+        else return null
+    }
+
+    async purchaseCart (ticket) {
+        await this.getCarts('./dao/file/dataBase/tickets.json')
+        const id = await this.lastId('./dao/file/dataBase/tickets.json') + 1
+        ticket.id = id
+        const purchase = await this.createTicket(ticket)
+        if (purchase) return true
     }
 }
 

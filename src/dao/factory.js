@@ -5,6 +5,7 @@ import { opts } from "../config/commander.js"
 export let Product
 export let Cart
 export let User
+export let Chat
 
 console.log('PERSISTENCIA:', opts.persistence)
 
@@ -16,10 +17,12 @@ switch (opts.persistence) {
         const {default: ProductMongo} = await import ('./mongo/product.mongo.js')
         const {default: CartMongo} = await import ('./mongo/cart.mongo.js')
         const {default: UserMongo} = await import ('./mongo/user.mongo.js')
+        const {default: ChatMongo} = await import ('./mongo/chat.mongo.js')
 
         Product = ProductMongo
         Cart = CartMongo
         User = UserMongo
+        Chat = ChatMongo
 
         break
     case 'FILE':

@@ -94,7 +94,7 @@ class ProductManager{
 
     updateProduct = async ({query, update, options}) => {
         const list = await this.getProducts()
-        const idx = list.findIndex(d => d.id === parseInt(query._id))
+        const idx = list.findIndex(d => d.id === parseInt(query._id || query.id))
         const newCode = await this.uniqueCode()
         const key = await this.keyValue(update)
         if (!key) throw new Error ('Modifying the ID directly is not allowed')
@@ -110,7 +110,6 @@ class ProductManager{
                 throw new Error(`Cannot add property '${prop}'`)
             }
         }
-
         list[idx] = Object.assign({}, list[idx], key.result)
         const write = await fs.promises.writeFile(this.filename, JSON.stringify(list, null, 2))
         if(write !== undefined) return null

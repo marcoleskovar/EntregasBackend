@@ -1,13 +1,7 @@
 const socket = io()
 const input = document.getElementById('messageInput')
 const container = document.getElementById('chatBox')
-
-let newUser = sessionStorage.getItem('user') || ''
-
-if (!newUser){
-    newUser = prompt('Ingrese su nombre')
-    sessionStorage.setItem('user', newUser)
-}
+const username = document.getElementById('username').textContent
     
 input.onkeyup = async (event) => {
     if (event.key === 'Enter' && event.currentTarget.value.trim().length > 0){
@@ -19,7 +13,7 @@ input.onkeyup = async (event) => {
 const sendMessage = async (msg) => {
     try{
         const message = {
-            user: newUser,
+            user: username,
             message: msg
         }
         await fetch ('/chat', {
