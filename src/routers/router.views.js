@@ -19,3 +19,4 @@ router.get('/profile', auth, profileView)
 router.get('/logout', auth, logoutView)
 
 export default router
+//
