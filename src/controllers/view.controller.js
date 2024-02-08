@@ -1,4 +1,5 @@
 import { ProductService, CartService } from "../services/service.js"
+import { generateMockingProds } from "../utils.js"
 import ViewsManager from "../dao/file/managers/ViewsManager.js"
 
 const manager = new ViewsManager()
@@ -70,6 +71,14 @@ export const profileView = async (req, res) => {
         const err = await controllerError(error)
         return res.status(500).json(err)
     }
+}
+
+export const mockingProds = async (req, res) => {
+    const products = []
+    for (let i = 0; i <= 100; i++){
+        products.push(generateMockingProds())
+    }
+    return res.send(products)
 }
 
 export const logoutView = async (req, res) => {

@@ -1,6 +1,7 @@
 import { fileURLToPath } from 'url'
 import { dirname } from 'path'
 import { UserService } from './services/service.js'
+import {faker} from '@faker-js/faker'
 import CurrentDTO from './dto/file/current.dto.js'
 import bcrypt from "bcrypt"
 import config from './config/config.js'
@@ -50,5 +51,18 @@ export const authRole = (role) => {
         const user = new CurrentDTO (req.session.user)
         if (user.role != role) return res.status(401).json({ error: 'Unauthorized' })
         return next()
+    }
+}
+
+export const generateMockingProds = () => {
+    return {
+        title: faker.commerce.productName(),
+        description: faker.commerce.productDescription(),
+        price: faker.commerce.price(),
+        thumbnail: [faker.image.url()],
+        code: Math.random().toString(32).substring(7),
+        category: faker.commerce.productMaterial(),
+        stock: faker.number.int({max: 100}),
+        status: true,
     }
 }
