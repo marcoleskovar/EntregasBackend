@@ -8,8 +8,8 @@ export let Cart
 export let User
 export let Chat
 
-const errorFunc = (status, area, detail = '') => {
-    return {status, area, detail}
+const errorFunc = (message= '', status, area, detail = '') => {
+    return {message, status, area, detail}
 }
 
 logger.info(`Persistence: ${opts.persistence}`)
@@ -18,7 +18,7 @@ switch (opts.persistence) {
     case 'MONGO':
         await mongoose.connect(config.mongoURL, {dbName: config.dbName})
             .then(() => {logger.info('Mongo connected')})
-            .catch((err) => {return logger.fatal('Error connecting to Mongo', errorFunc(500, 'factory', err))})
+            .catch((err) => {return logger.fatal(errorFunc('Error connecting to Mongo', 500, 'factory', err))})
         
         const {default: ProductMongo} = await import ('./mongo/product.mongo.js')
         const {default: CartMongo} = await import ('./mongo/cart.mongo.js')

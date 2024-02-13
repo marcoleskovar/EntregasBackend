@@ -1,3 +1,5 @@
+import { errorToLogger, logger } from "../utils/logger.js"
+
 export default class UserRepository {
     constructor (dao) {
         this.dao = dao
@@ -24,14 +26,20 @@ export default class UserRepository {
 
         const result = await this.dao.getById(id)
 
-        if (!result) return await this.error( 'UserID not found', 404)
+        if (!result) {
+            logger.warning(await errorToLogger('UserID not found', 404, 'userRepository'))
+            return await this.error( 'UserID not found', 404)
+        }
         else return await this.success('El usuario se encontro correctamente por ID', result)
     }
 
     async getByEmail (email) {
         const result = await this.dao.getByEmail(email)
 
-        if (!result) return await this.error( 'Email not found', 404)
+        if (!result) {
+            logger.warning(await errorToLogger('Email not found', 404, 'userRepository'))
+            return await this.error( 'Email not found', 404)
+        }
         else return await this.success('El usuario se encontro correctamente por email', result)
     }
 
@@ -45,7 +53,10 @@ export default class UserRepository {
     async createUser (data) {
         const result = await this.dao.createUser(data)
         
-        if(!result) return await this.error('No se ha creado correctamente el usuario', 400)
+    if(!result) {
+        logger.error(await errorToLogger('No se ha creado correctamente el usuario', 500, 'userRepository'))
+        return await this.error('No se ha creado correctamente el usuario', 500)
+    }
         else return await this.success('Se ha creado correctamente el usuario', result)
     }
 }

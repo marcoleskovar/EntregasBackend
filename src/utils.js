@@ -5,6 +5,7 @@ import {faker} from '@faker-js/faker'
 import CurrentDTO from './dto/file/current.dto.js'
 import bcrypt from "bcrypt"
 import config from './config/config.js'
+import { logger, errorToLogger } from './utils/logger.js'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = dirname(__filename)
@@ -23,10 +24,16 @@ export const existUser = async (username, email) => {
     if (!username || !email) throw new Error ('Either username or email are empty')
 
     const userUsername = await UserService.getByUsername(username)
-    if (userUsername.success) throw new Error ('Username already in use')
+    if (userUsername.success) {
+        logger.warning(await errorToLogger('Username already in use', 409, 'utils'))
+        throw new Error ('Username already in use')
+    }
 
     const userEmail = await UserService.getByEmail(email)
-    if (userEmail.success) throw new Error ('Email already in use')
+    if (userEmail.success) {
+        logger.warning(await errorToLogger('Email already in use', 409, 'utils'))
+        throw new Error ('Email already in use')
+    }
     
     return userEmail
 }

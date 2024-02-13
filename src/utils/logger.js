@@ -26,7 +26,7 @@ const custom = {
 const customFormat = winston.format.printf(({ level, message, timestamp, ...metadata }) => {
     const logObject = {
         level : `[${level.toUpperCase()}]`,
-        message,
+        message: message || metadata.message,
         success: metadata.success || false,
         timestamp: moment().format('DD-MM-YYYY / HH:mm'),
         status: metadata.status || 500,
@@ -66,4 +66,8 @@ export const addLogger = (req, res, next) => {
     req.logger = logger
     req.logger.http(`[${req?.method}] ${req?.url} - ${new Date().toLocaleTimeString()}`)
     next()
+}
+
+export const errorToLogger = async (message= '', status, area, detail= '') => {
+    return {success: false, message, status, area, detail}
 }
