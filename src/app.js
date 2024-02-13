@@ -1,13 +1,16 @@
-//IMPORT TOOLS
+//IMPORT LIBRARIES
 import express from 'express'
 import handlebars from 'express-handlebars'
-import __dirname from './utils.js'
 import { Server } from 'socket.io'
 import session from 'express-session'
 import MongoStore from 'connect-mongo'
 import passport from 'passport'
+
+//IMPORT TOOLS
+import __dirname from './utils.js'
 import initPassport from './config/passport.config.js'
 import config from './config/config.js'
+import {addLogger} from './utils/logger.js'
 
 //IMPORT ROUTERS
 import productsRouter from './routers/product.router.js'
@@ -18,6 +21,9 @@ import chatRouter from './routers/chat.router.js'
 
 //DEFINING CONSTANTS
 const app = express()
+
+//LOGGER
+app.use(addLogger)
 
 //CREATING SESSION
 app.use(session({
