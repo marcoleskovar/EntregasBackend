@@ -35,16 +35,14 @@ switch (opts.persistence) {
         const {default: ProductFile} = await import ('./file/managers/ProductManager.js')
         const {default: CartFile} = await import ('./file/managers/CartManager.js')
         const {default: UserFile} = await import ('./file/managers/UserManager.js')
+        const {default: ChatFile} = await import ('./file/managers/ChatManager.js')
 
         Product = ProductFile
         Cart = CartFile
         User = UserFile
+        Chat = ChatFile
         
         break
-    case 'MEMORY':
-
-        break
-
     default:
         logger.fatal('Undefined persistence')
         process.exit(1)

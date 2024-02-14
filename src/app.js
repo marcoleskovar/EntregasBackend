@@ -10,7 +10,7 @@ import passport from 'passport'
 import __dirname from './utils.js'
 import initPassport from './config/passport.config.js'
 import config from './config/config.js'
-import {addLogger} from './utils/logger.js'
+import {logger, addLogger} from './utils/logger.js'
 
 //IMPORT ROUTERS
 import productsRouter from './routers/product.router.js'
@@ -62,10 +62,10 @@ app.use('/session', sessionRouter)
 app.use('/chat', chatRouter)
 
 //LISTEN
-const httpServer = app.listen(config.port, () => console.log('RUNNING...'))
+const httpServer = app.listen(config.port, () => logger.info('Running'))
 const io = new Server(httpServer)
 io.on('connection', socket => {
-    console.log('Nuevo cliente conectado')
+    logger.info('New client connected')
     
     socket.on('newList', async products => {
         io.emit('updatedProducts', products)

@@ -20,12 +20,8 @@ class ChatRepository {
         return await this.success('Se cargaron todos los chats', messages)
     }
 
-    async postChat (data, user) {
-        const newMessage = {
-            user,
-            message: data
-        }
-        const message = await this.dao.postChat(newMessage)
+    async postChat (data) {
+        const message = await this.dao.postChat(data)
 
         if (!message) return await this.error('Ha ocurrido un error al postear un mensaje', 500)
         else return await this.success('Se ha creado el mensaje', message)
