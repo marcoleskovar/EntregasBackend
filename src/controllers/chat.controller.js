@@ -1,11 +1,9 @@
 import { ChatService } from "../services/service.js"
+import { error } from "../utils.js"
+import { logger } from "../utils/logger.js"
 
 const service = ChatService
-
-const controllerError = async (e) => {
-    const result = {success: false, area: 'Chat-Controller', catchError: e.message, detail: e}
-    return result
-}
+const area = 'chatController'
 
 export const getChat = async (req, res) => {
     try {
@@ -15,8 +13,9 @@ export const getChat = async (req, res) => {
 
         if (!result.success) return res.status(result.status).json(result)
         else return res.render('chat', {messages, user})
-    } catch (error) {
-        const err = await controllerError(error)
+    } catch (e) {
+        const err = await error ('Error in getChat', 500, area, e)
+        logger.error (err)
         return res.status(500).json(err)
     }
 }
@@ -28,8 +27,9 @@ export const postChat = async (req, res) => {
 
         if (!result.success) return res.status(result.status).json(result)
         else return res.status(200).json(result)
-    } catch (error) {
-        const err = await controllerError(error)
+    } catch (e) {
+        const err = await error ('Error in postChat', 500, area, e)
+        logger.error (err)
         return res.status(500).json(err)
     }
 }

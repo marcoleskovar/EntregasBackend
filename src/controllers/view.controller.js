@@ -5,12 +5,7 @@ import { logger } from "../utils/logger.js"
 import { error } from "../utils.js"
 
 const manager = new ViewsManager()
-
-const controllerError = async (e) => {
-    const result = {success: false, area: 'Views-Controller', catchError: e.message, detail: e}
-    return result
-}
-
+const area = 'viewController'
 
 export const homeView = async (req, res) => {
     try {
@@ -18,8 +13,9 @@ export const homeView = async (req, res) => {
         const home = await manager.homeView(result)
         if (home.success) return res.json(home)
     }
-    catch (error) {
-        const err = await controllerError(error)
+    catch (e) {
+        const err = await error ('Error in homeView', 500, area, e)
+        logger.error (err)
         return res.status(500).json(err)
     }
 }
@@ -30,8 +26,9 @@ export const productsView = async (req, res) => {
         const result = await ProductService.queryParams(req)
         res.render('products', {result, user})
     }
-    catch (error) {
-        const err = await controllerError(error)
+    catch (e) {
+        const err = await error ('Error in productsView', 500, area, e)
+        logger.error (err)
         return res.status(500).json(err)
     }
 }
@@ -41,8 +38,9 @@ export const realTimeProductsView = async (req, res) => {
         const result = await ProductService.queryParams(req)
         res.render('realTimeProducts', result)
     }
-    catch (error) {
-        const err = await controllerError(error)
+    catch (e) {
+        const err = await error ('Error in realTimeProductsView', 500, area, e)
+        logger.error (err)
         return res.status(500).json(err)
     }
 }
@@ -57,8 +55,9 @@ export const cartView = async (req, res) => {
             return res.render('cart', {products, cid})
         }
     }
-    catch (error) {
-        const err = await controllerError(error)
+    catch (e) {
+        const err = await error ('Error in cartView', 500, area, e)
+        logger.error (err)
         return res.status(500).json(err)
     }
 }
@@ -69,8 +68,9 @@ export const profileView = async (req, res) => {
         const user = req.session.user
         res.render('profile', user)
     }
-    catch (error) {
-        const err = await controllerError(error)
+    catch (e) {
+        const err = await error ('Error in profileView', 500, area, e)
+        logger.error (err)
         return res.status(500).json(err)
     }
 }

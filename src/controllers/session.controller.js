@@ -1,4 +1,6 @@
 import CurrentDTO from "../dto/file/current.dto.js"
+import { error } from "../utils.js"
+import { logger } from "../utils/logger.js"
 
 export const getLogin = (req, res) => {
     res.render('login', {})
@@ -33,7 +35,9 @@ export const postLogin = async (req, res) => {
         return res.redirect('/products')
     }
     catch (e) {
-        return res.status(500).json({success: false, error: e.message, detail: e})
+        const err = await error ('Error in postLogin', 500, 'sessionController', e)
+        logger.error (err)
+        return res.status(500).json(err)
     }
 }
 
@@ -42,6 +46,8 @@ export const postRegister = async (req, res) => {
         return res.redirect('/session/login')
     }
     catch (e) {
-        return res.status(500).json({success: false, error: e.message, detail: e})
+        const err = await error ('Error in postRegister', 500, 'sessionController', e)
+        logger.error (err)
+        return res.status(500).json(err)
     }
 }

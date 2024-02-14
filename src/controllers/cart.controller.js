@@ -1,12 +1,9 @@
 import { CartService, ProductService } from "../services/service.js"
+import { error } from "../utils.js"
+import { logger } from "../utils/logger.js"
 
 const service = CartService
-
-//IF ERROR - CONTROLLER
-const controllerError = async (e) => {
-    const result = {success: false, area: 'Cart-Controller', catchError: e.message, detail: e}
-    return result
-}
+const area = 'cartController'
 
 export const getCarts = async (req, res) => {//CHECK
     try {
@@ -14,8 +11,9 @@ export const getCarts = async (req, res) => {//CHECK
 
         if (!result.success) return res.status(result.status).json(result)
         else return res.status(200).json(result)
-    } catch (error) {
-        const err = await controllerError(error)
+    } catch (e) {
+        const err = await error ('Error in getCarts', 500, area, e)
+        logger.error (err)
         return res.status(500).json(err)
     }
 }
@@ -27,8 +25,9 @@ export const getCartById = async (req, res) => {//CHECK
 
         if (!result.success) return res.status(result.status).json(result)
         else return res.status(200).json(result)
-    } catch (error) {
-        const err = await controllerError(error)
+    } catch (e) {
+        const err = await error ('Error in getCartById', 500, area, e)
+        logger.error (err)
         return res.status(500).json(err)
     }
 }
@@ -40,8 +39,9 @@ export const createCart = async (req, res) => {//CHECK
 
         if (!result.success) return res.status(result.status).json(result)
         else return res.status(200).json(result)
-    } catch (error) {
-        const err = await controllerError(error)
+    } catch (e) {
+        const err = await error ('Error in createCart', 500, area, e)
+        logger.error (err)
         return res.status(500).json(err)
     }
 }
@@ -59,8 +59,9 @@ export const addToCart = async (req, res) => {
 
         if (!result.success) return res.status(result.status).json(result)
         else return res.status(200).json(result)
-    } catch (error) {
-        const err = await controllerError(error)
+    } catch (e) {
+        const err = await error ('Error in addToCart', 500, area, e)
+        logger.error (err)
         return res.status(500).json(err)
     }
 }
@@ -80,10 +81,12 @@ export const updateCart = async (req, res) => {//body = [{"product": "pid"}]
 
         if (!result.success) return res.status(result.status).json(result)
         else return res.status(200).json(result)
-    } catch (error) {
-        const err = await controllerError(error)
-        if (err.catchError === 'data is not iterable'){
-            const nonIterableData = await controllerError('Body debe recibir por lo menos << [{``product``: productID}] >>')
+    } catch (e) {
+        const err = await error (e.message, 500, area, e)
+        logger.error (err)
+        if (err.message === 'data is not iterable'){
+            const nonIterableData = await error('Body debe recibir por lo menos << [{``product``: productID}] >>', 500, area, e)
+            logger.error (nonIterableData)
             return res.status(500).json(nonIterableData)
         }
         return res.status(500).json(err)
@@ -106,8 +109,9 @@ export const updateCartQuant = async (req, res) => {//body = {quantity: number}
 
         if (!result.success) return res.status(result.status).json(result)
         else return res.status(200).json(result)
-    } catch (error) {
-        const err = await controllerError(error)
+    } catch (e) {
+        const err = await error ('Error in updateCartQuant', 500, area, e)
+        logger.error (err)
         return res.status(500).json(err)
     }
 }
@@ -125,8 +129,9 @@ export const deleteProdCart = async (req, res) => {
 
         if (!result.success) return res.status(result.status).json(result)
         else return res.status(200).json(result)
-    } catch (error) {
-        const err = await controllerError(error)
+    } catch (e) {
+        const err = await error ('Error in deleteProdCart', 500, area, e)
+        logger.error (err)
         return res.status(500).json(err)
     }
 }
@@ -138,8 +143,9 @@ export const deleteCart = async (req, res) => {//CHECK
 
         if (!result.success) return res.status(result.status).json(result)
         else return res.status(200).json(result)
-    } catch (error) {
-        const err = await controllerError(error)
+    } catch (e) {
+        const err = await error ('Error in deleteCart', 500, area, e)
+        logger.error (err)
         return res.status(500).json(err)
     }
 }
@@ -157,8 +163,9 @@ export const purchaseCart = async (req, res) => {
                 return res.json({status: 'success'})//no funciona!
             }
         }
-    } catch (error) {
-        const err = await controllerError(error)
+    } catch (e) {
+        const err = await error ('Error in purchaseCart', 500, area, e)
+        logger.error (err)
         return res.status(500).json(err)
     }
 }

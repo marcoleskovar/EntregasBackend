@@ -1,12 +1,10 @@
 import { ProductService } from "../services/service.js"
 import ProductDTO from "../dto/file/product.dto.js"
+import { error } from "../utils.js"
+import { logger } from "../utils/logger.js"
 
 const service = ProductService
-
-const controllerError = async (e) => {
-    const result = {success: false, area: 'Product-Controller', catchError: e.message, detail: e}
-    return result
-}
+const area = 'productController'
 
 export const getProducts = async (req, res) => {//CHECK
     try {
@@ -15,8 +13,9 @@ export const getProducts = async (req, res) => {//CHECK
 
         if (!result.success) return res.status(result.status).json(result)
         else return res.status(200).json(result)
-    } catch (error) {
-        const err = await controllerError(error)
+    } catch (e) {
+        const err = await error ('Error in getProducts', 500, area, e)
+        logger.error (err)
         return res.status(500).json(err)
     }
 }
@@ -28,8 +27,9 @@ export const getProductById = async (req, res) => {//CHECK
 
         if (!result.success) return res.status(result.status).json(result)
         else return res.status(200).json(result)
-    } catch (error) {
-        const err = await controllerError(error)
+    } catch (e) {
+        const err = await error ('Error in getProductById', 500, area, e)
+        logger.error (err)
         return res.status(500).json(err)
     }
 }
@@ -43,8 +43,9 @@ export const createProduct = async (req, res) => {//CHECK
 
         if (!result.success) return res.status(result.status).json(result)
         else return res.status(200).json(result)
-    } catch (error) {
-        const err = await controllerError(error)
+    } catch (e) {
+        const err = await error ('Error in createProduct', 500, area, e)
+        logger.error (err)
         return res.status(500).json(err)
     }
 }
@@ -57,8 +58,9 @@ export const updateProduct = async (req, res) => {//CHECK
 
         if (!result.success) return res.status(result.status).json(result)
         else return res.status(200).json(result)
-    } catch (error) {
-        const err = await controllerError(error)
+    } catch (e) {
+        const err = await error ('Error in updateProduct', 500, area, e)
+        logger.error (err)
         return res.status(500).json(err)
     }
 }
@@ -70,8 +72,9 @@ export const deleteProduct = async (req, res) => {//CHECK
 
         if (!result.success) return res.status(result.status).json(result)
         else return res.status(200).json(result)
-    } catch (error) {
-        const err = await controllerError(error)
+    } catch (e) {
+        const err = await error ('Error in deleteProduct', 500, area, e)
+        logger.error (err)
         return res.status(500).json(err)
     }
 }
