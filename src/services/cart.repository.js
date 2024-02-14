@@ -1,6 +1,6 @@
 import moment from "moment"
 import { ProductService } from "./service.js"
-import { errorToLogger, logger } from "../utils/logger.js"
+import { logger } from "../utils/logger.js"
 
 export default class CartRepository {
     constructor (dao) {
@@ -41,7 +41,7 @@ export default class CartRepository {
         const create = await this.dao.createCart(data)
         
         if(!create) {
-            logger.error(await errorToLogger('No se ha creado correctamente el carrito', 500, 'cartRepository'))
+            logger.error(await error('No se ha creado correctamente el carrito', 500, 'cartRepository'))
             return await this.error('No se ha creado correctamente el carrito', 500)
         }
         else return await this.success('Se ha creado correctamente el carrito', create)

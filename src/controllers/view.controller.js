@@ -1,6 +1,8 @@
 import { ProductService, CartService } from "../services/service.js"
 import { generateMockingProds } from "../utils.js"
 import ViewsManager from "../dao/file/managers/ViewsManager.js"
+import { logger } from "../utils/logger.js"
+import { error } from "../utils.js"
 
 const manager = new ViewsManager()
 
@@ -86,4 +88,14 @@ export const logoutView = async (req, res) => {
         if(err) return res.send('Logout error')
         return res.redirect('/session/login')
     })   
+}
+
+export const testLogs = async (req, res) => {
+    logger.debug('PASS')
+    logger.http('PASS')
+    logger.info('PASS')
+    logger.warning('PASS')
+    logger.error(await error('PASS', 200, 'viewsController', 'TEST-RESULT'))
+    logger.fatal(await error('PASS', 200, 'viewsController', 'TEST-RESULT'))
+    return res.json({result: 'tested'})
 }

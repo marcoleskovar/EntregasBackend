@@ -5,7 +5,7 @@ import {faker} from '@faker-js/faker'
 import CurrentDTO from './dto/file/current.dto.js'
 import bcrypt from "bcrypt"
 import config from './config/config.js'
-import { logger, errorToLogger } from './utils/logger.js'
+import { logger } from './utils/logger.js'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = dirname(__filename)
@@ -25,13 +25,13 @@ export const existUser = async (username, email) => {
 
     const userUsername = await UserService.getByUsername(username)
     if (userUsername.success) {
-        logger.warning(await errorToLogger('Username already in use', 409, 'utils'))
+        logger.warning(await error('Username already in use', 409, 'utils'))
         throw new Error ('Username already in use')
     }
 
     const userEmail = await UserService.getByEmail(email)
     if (userEmail.success) {
-        logger.warning(await errorToLogger('Email already in use', 409, 'utils'))
+        logger.warning(await error('Email already in use', 409, 'utils'))
         throw new Error ('Email already in use')
     }
     
@@ -72,4 +72,12 @@ export const generateMockingProds = () => {
         stock: faker.number.int({max: 100}),
         status: true,
     }
+}
+
+export const success = async (message, result, area, detail= '') => {
+    return {success: true, message, result, area, detail}
+}
+
+export const error = async (message, status, area, detail = '') => {
+    return {success: false, message, status, area, detail}
 }

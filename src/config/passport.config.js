@@ -4,7 +4,8 @@ import GitHubStrategy from 'passport-github2'
 import UserDTO from '../dto/file/user.dto.js'
 import { createHash, validateUser, existUser, rol, validatePassword } from '../utils.js'
 import { UserService, CartService } from '../services/service.js'
-import { logger, errorToLogger } from '../utils/logger.js'
+import { logger } from '../utils/logger.js'
+import { error } from '../utils.js'
 
 const LocalStrategy = local.Strategy
 
@@ -16,7 +17,7 @@ const initPassport = () => {
         try {
             const {name, lastname, email, username, age, gender} = req.body
             if (!name || !lastname || !email || !username || !password || !age || !gender){
-                logger.error(await errorToLogger('Empty fields', 400, 'passport'))
+                logger.error(await error('Empty fields', 400, 'passport'))
                 return done ('EMPTY FIELDS', false)
             }
             const exist = await existUser(username, emailParam)
@@ -42,7 +43,7 @@ const initPassport = () => {
             }   
         }
         catch (error) {
-            logger.warning(await errorToLogger('Error to register', 500, 'passport', error))
+            logger.warning(await error('Error to register', 500, 'passport', error))
             return done ('ERROR TO REGISTER: ' + error)
         }
     }))
@@ -53,17 +54,17 @@ const initPassport = () => {
         try {
             const user = await validateUser(username)
             if(!user.success){
-                logger.warning(await errorToLogger('Error validating user', 404, 'passport'))
+                logger.warning(await error('Error validating user', 404, 'passport'))
                 return done (user.tryError, false)
             }
             if(!validatePassword(user.result, password)){
-                logger.warning(await errorToLogger('Error validating password', 400, 'passport'))
+                logger.warning(await error('Error validating password', 400, 'passport'))
                 return done ('INCORRECT PASSWORD', false)
             }
             return done (null, user.result)
         }
         catch(e){
-            logger.error(await errorToLogger('Error to login', 500, 'passport', e))
+            logger.error(await error('Error to login', 500, 'passport', e))
             return done ('ERROR TO LOGIN: ' + e)
         }
     }))
@@ -96,7 +97,7 @@ const initPassport = () => {
             }
         }
         catch(e){
-            logger.warning(await errorToLogger('Error to login with Github', 500, 'passport', e))
+            logger.warning(await error('Error to login with Github', 500, 'passport', e))
             return done ('ERROR TO LOGIN WITH GITHUB' + e)
         }
     }))

@@ -67,7 +67,3 @@ export const addLogger = (req, res, next) => {
     req.logger.http(`[${req?.method}] ${req?.url} - ${new Date().toLocaleTimeString()}`)
     next()
 }
-
-export const errorToLogger = async (message= '', status, area, detail= '') => {
-    return {success: false, message, status, area, detail}
-}
