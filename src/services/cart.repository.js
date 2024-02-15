@@ -1,50 +1,36 @@
 import moment from "moment"
 import { ProductService } from "./service.js"
-import { logger } from "../utils/logger.js"
+import { error, success } from "../utils.js"
 
 export default class CartRepository {
     constructor (dao) {
         this.dao = dao
-    }
-
-    //IF SUCCESS
-    async success (message, data) {
-        const result = {success: true, message: message, result: data}
-        return result
-    }
-
-    //IF ERROR
-    async error (message, status) {
-        const result = {success: false, area: 'Cart-Service', tryError: message, status: status}
-        return result
+        this.area = 'cartRepository'
     }
     
     //ALL CARTS
     async getCarts () {
         const carts = await this.dao.getCarts()
 
-        return await this.success('Se han encontrado correctamente los carritos', carts)
+        return await success('Se han encontrado correctamente los carritos', carts, this.area)
     }
 
     //SPECIFIC CART
     async getCartById (id) {
-        if (id <= 0) return await this.error('ID has to be above 0', 400)
+        if (id <= 0) return await error('ID has to be above 0', 400, this.area)
         
         const cartById = await this.dao.getCartById(id)
 
-        if (cartById === null) return await this.error( 'CartID not found', 404)
-        else return await this.success('El carrito se encontro correctamente', cartById)//{id, products: prodArray}
+        if (cartById === null) return await error( 'CartID not found', 404, this.area)
+        else return await success('El carrito se encontro correctamente', cartById, this.area)//{id, products: prodArray}
     }
 
     //POST CART
     async createCart (data) {
         const create = await this.dao.createCart(data)
         
-        if(!create) {
-            logger.error(await error('No se ha creado correctamente el carrito', 500, 'cartRepository'))
-            return await this.error('No se ha creado correctamente el carrito', 500)
-        }
-        else return await this.success('Se ha creado correctamente el carrito', create)
+        if(!create) return await error('No se ha creado correctamente el carrito', 500, this.area)
+        else return await success('Se ha creado correctamente el carrito', create, this.area)
     }
 
     //ADD PRODUCT TO CART
@@ -76,7 +62,7 @@ export default class CartRepository {
             await this.dao.updateCart(cartUpdateQuery)
         }
 
-        return await this.success('Se ha agregado correctamente el producto al carrito', productData)
+        return await success('Se ha agregado correctamente el producto al carrito', productData, this.area)
     }
 
     //CHANGE CART
@@ -101,8 +87,8 @@ export default class CartRepository {
         }
         const result = await this.dao.updateCart(cartUpdateQuery)
 
-        if (!result) return await this.error('No se ha modificado correctamente el carrito', 400)
-        return await this.success('Se ha modificado correctamente el carrito', result)
+        if (!result) return await error('No se ha modificado correctamente el carrito', 500, this.area)
+        return await success('Se ha modificado correctamente el carrito', result, this.area)
     }
 
     
@@ -119,8 +105,8 @@ export default class CartRepository {
         }
 
         const cartModified = await this.dao.updateCart(cartUpdateQuery)
-        if(!cartModified) return await this.error('No se ha modificado correctamente el carrito', 400)
-        else return await this.success('Se ha modificado correctamente el carrito', cartModified)
+        if(!cartModified) return await error('No se ha modificado correctamente el carrito', 500, this.area)
+        else return await success('Se ha modificado correctamente el carrito', cartModified, this.area)
     }
 
     //DELETE CART
@@ -131,8 +117,8 @@ export default class CartRepository {
 
         const cart = await this.dao.deleteCart(id)
 
-        if (cart.deletedCount > 0) return await this.success('Se ha eliminado correctamente el carrito', exist.result)
-        else return await this.error('No se ha eliminado correctamente el carrito', 400)
+        if (cart.deletedCount > 0) return await success('Se ha eliminado correctamente el carrito', exist.result, this.area)
+        else return await error('No se ha eliminado correctamente el carrito', 500, this.area)
     }
 
     //DELETE PRODUCT FROM CART
@@ -149,8 +135,8 @@ export default class CartRepository {
 
         const cartModified = await this.dao.updateCart(cartUpdateQuery)
         
-        if(!cartModified) return await this.error('No se ha eliminado correctamente el producto del carrito', 400)
-        else return await this.success('Se ha eliminado correctamente el producto del carrito', cartModified)
+        if(!cartModified) return await error('No se ha eliminado correctamente el producto del carrito', 500, this.area)
+        else return await success('Se ha eliminado correctamente el producto del carrito', cartModified, this.area)
     }
 
     async purchaseCart (cid, user) {
@@ -177,19 +163,19 @@ export default class CartRepository {
 
             const purchase = await this.dao.purchaseCart(ticket)
 
-            if (!purchase) return await this.error('No se ha podido hacer la compra', 500)
+            if (!purchase) return await error('No se ha podido hacer la compra', 500, this.area)
 
             for (const p of await validProds) {
                 const updated =  await ProductService.updateProduct(p.product._id || p.product.id, { stock: p.product.stock - p.quantity })
-                if (!updated.success) return await this.error('No se ha actualizado el producto', 500);
+                if (!updated.success) return updated
                 
                 const deleted = await this.deleteProdCart(cid, p.product._id || p.product.id)
                 
-                if (!deleted.success) return await this.error('No se ha borrado del carrito', 500)
+                if (!deleted.success) return deleted
             }
-            return await this.success ('Se ha borrado del carrito correctamente', 'All good')
+            return await success ('Se ha borrado del carrito correctamente', 'All good', this.area)
         }else {
-            return await this.error ('Not Valid Products', 400)
+            return await error ('Not Valid Products', 400, this.area)
         }
     }
 }

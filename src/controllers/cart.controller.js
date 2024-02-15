@@ -85,9 +85,9 @@ export const updateCart = async (req, res) => {//body = [{"product": "pid"}]
         const err = await error (e.message, 500, area, e)
         logger.error (err)
         if (err.message === 'data is not iterable'){
-            const nonIterableData = await error('Body debe recibir por lo menos << [{``product``: productID}] >>', 500, area, e)
+            const nonIterableData = await error('Body debe recibir por lo menos << [{``product``: productID}] >>', 400, area, e)
             logger.error (nonIterableData)
-            return res.status(500).json(nonIterableData)
+            return res.status(400).json(nonIterableData)
         }
         return res.status(500).json(err)
     }
@@ -99,7 +99,10 @@ export const updateCartQuant = async (req, res) => {//body = {quantity: number}
         const pid = req.params.pid
         const quantity = req.body.quantity
 
-        if (!quantity) throw new Error ('Body debe recibir ``{quantity``: Number}')
+        if (!quantity) {
+            logger.warning('Body debe recibir ``{quantity``: Number}', 400, area)
+            throw new Error ('Body debe recibir ``{quantity``: Number}')
+        }
 
         const product = await ProductService.getProductById(pid)
 

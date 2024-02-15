@@ -6,6 +6,7 @@ class ChatManager {
         this._products = []
         this.filename = './dao/file/dataBase/chat.json'
         this._format = 'utf-8'
+        this.area = 'ChatManager'
     }
 
     lastId = async () => {
@@ -16,8 +17,8 @@ class ChatManager {
             }, 0)
             return maxId
         }
-        catch (error){
-            logger.error(await error('No se ha generado un ID', 500, 'ChatManager', error))
+        catch (e){
+            logger.fatal(await error('No se ha generado un ID', 500, this.area, e))
             throw new Error ('No se ha generado un ID')
         }
     }
@@ -25,13 +26,13 @@ class ChatManager {
     fileContent = async (path, format) => {
         const list = await fs.promises.readFile(path, format)
         if (list.trim() === '') {
-            logger.fatal(await error(`La databse ${this.filename} no tiene ningun dato`, 500, 'ChatManager'))
+            logger.fatal(await error(`La databse ${this.filename} no tiene ningun dato`, 500, this.area))
             throw new Error (`La dataBase ${this.filename} no tiene ningun dato`)
         }
         const parse = JSON.parse(list)
         
         if (!Array.isArray(parse)){
-            logger.fatal(await error(`La databse ${this.filename} tiene un formato erroneo`, 500, 'ChatManager'))
+            logger.fatal(await error(`La database ${this.filename} tiene un formato erroneo`, 500, this.area))
             throw new Error ('La dataBase tiene un formato erroneo')
         }
         
@@ -56,14 +57,14 @@ class ChatManager {
         const pushear = list.push(data)
 
         if (!pushear) {
-            logger.error(await error('Error posting a message', 500, 'ChatManager'))
+            logger.error(await error('Error posting a message', 500, this.area))
             return null
         }
         
         const write = await fs.promises.writeFile(this.filename, JSON.stringify(list, null, 2))
         if (write === undefined) return data
         else {
-            logger.error(await error(`Error writing in ${this.filename}`, 500, 'ChatManager'))
+            logger.error(await error(`Error writing in ${this.filename}`, 500, this.area))
             return null
         }
     }

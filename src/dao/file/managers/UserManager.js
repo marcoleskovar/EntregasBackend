@@ -1,5 +1,7 @@
 import fs from 'fs'
 import cartManager from './CartManager.js'
+import { logger } from '../../../utils/logger.js'
+import { error } from '../../../utils.js'
 
 class UserManager {
     constructor(){
@@ -7,6 +9,7 @@ class UserManager {
         this.filename = './dao/file/dataBase/users.json'
         this._format = 'utf-8'
         this.prodManager = new cartManager()
+        this.area = 'UserManager'
     }
 
     lastId = async () => {
@@ -17,16 +20,25 @@ class UserManager {
             }, 0)
             return maxId
         }
-        catch (error){
+        catch (e){
+            logger.fatal(await error('No se ha generado un ID', 500, this.area))
             throw new Error ('No se ha generado un ID')
         }
     }
 
     fileContent = async (path, format) => {//CHECK
         const list = await fs.promises.readFile(path, format)
+        if (list.trim() === '') {
+            logger.fatal(await error(`Database ${this.filename} no tiene ningun dato`, 500, this.area))
+            throw new Error (`La dataBase ${this.filename} no tiene ningun dato`)
+        }
+
         const parse = JSON.parse(list)
         
-        if (!Array.isArray(parse)) throw new Error ('La dataBase tiene un formato erroneo')
+        if (!Array.isArray(parse)) {
+            logger.fatal(await error(`Database ${this.filename} tiene un formato erroneo`, 500, this.area))
+            throw new Error ('La dataBase tiene un formato erroneo')
+        }
         
         return parse
     }
@@ -51,6 +63,7 @@ class UserManager {
                 if (!idExist) return null
                 else return idExist
             default:
+                logger.fatal('Unexpected error in Exist function', 500, this.area)
                 throw new Error ('Something unexpected happened in Exist function')
         }
     }
@@ -73,7 +86,10 @@ class UserManager {
     }
 
     getByEmail = async (email) => {
-        if (!email) throw new Error ('Email field is empty')
+        if (!email) {
+            logger.warning(await error ('Email is empty', 400, this.area))
+            throw new Error ('Email field is empty')
+        }
 
         const exist = await this.exist('email', email)
 
@@ -82,7 +98,10 @@ class UserManager {
     }
 
     getByUsername = async (username) => {
-        if (!username) throw new Error ('Username field is empty')
+        if (!username) {
+            logger.warning(await error ('Username is empty', 400, this.area))
+            throw new Error ('Username field is empty')
+        }
 
         const exist = await this.exist('username', username)
 
@@ -91,10 +110,16 @@ class UserManager {
     }
 
     createUser = async (data) => {
-        if (Object.keys(data).length === 0) throw new Error ('body vacio')
+        if (Object.keys(data).length === 0) {
+            logger.warning(await error('Body is empty', 400, this.area))
+            throw new Error ('body vacio')
+        }
 
         for (let i = 0; i <= data.length; i++){
-            if(data[i] === null) throw new Error (`${data[i]} is empty`)
+            if(data[i] === null) {
+                logger.error(await error(`${data[i]} is empty`, 400, this.area))
+                throw new Error (`${data[i]} is empty`)
+            }
         }
     
         const list = await this.getUsers()

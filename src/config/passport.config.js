@@ -17,7 +17,7 @@ const initPassport = () => {
         try {
             const {name, lastname, email, username, age, gender} = req.body
             if (!name || !lastname || !email || !username || !password || !age || !gender){
-                logger.error(await error('Empty fields', 400, 'passport'))
+                logger.warning(await error('Empty fields', 400, 'passport'))
                 return done ('EMPTY FIELDS', false)
             }
             const exist = await existUser(username, emailParam)
@@ -42,9 +42,9 @@ const initPassport = () => {
                 return done (null, result.result)
             }   
         }
-        catch (error) {
-            logger.warning(await error('Error to register', 500, 'passport', error))
-            return done ('ERROR TO REGISTER: ' + error)
+        catch (e) {
+            logger.warning(await error('Error to register', 500, 'passport', e))
+            return done ('ERROR TO REGISTER: ' + e)
         }
     }))
 
@@ -55,16 +55,16 @@ const initPassport = () => {
             const user = await validateUser(username)
             if(!user.success){
                 logger.warning(await error('Error validating user', 404, 'passport'))
-                return done (user.tryError, false)
+                return done (user.result, false)
             }
             if(!validatePassword(user.result, password)){
-                logger.warning(await error('Error validating password', 400, 'passport'))
+                logger.warning(await error('Error validating password', 401, 'passport'))
                 return done ('INCORRECT PASSWORD', false)
             }
             return done (null, user.result)
         }
         catch(e){
-            logger.error(await error('Error to login', 500, 'passport', e))
+            logger.fatal(await error('Error to login', 500, 'passport', e))
             return done ('ERROR TO LOGIN: ' + e)
         }
     }))
@@ -77,6 +77,7 @@ const initPassport = () => {
         try {
             const user = await UserService.getByEmail(profile._json.email)
             if(user.success){
+                logger.warning(await error('Error validating github-user', 404, 'passport'))
                 return done (null, user.result)
             }else{
                 const cartId = await CartService.createCart()
@@ -97,7 +98,7 @@ const initPassport = () => {
             }
         }
         catch(e){
-            logger.warning(await error('Error to login with Github', 500, 'passport', e))
+            logger.fatal(await error('Error to login with Github', 500, 'passport', e.Error))
             return done ('ERROR TO LOGIN WITH GITHUB' + e)
         }
     }))

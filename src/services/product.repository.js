@@ -1,21 +1,11 @@
 import ViewsManager from "../dao/file/managers/ViewsManager.js"
+import { success, error } from "../utils.js"
 
 export default class ProductRepository {
     constructor (dao) {
         this.dao = dao
         this.views = new ViewsManager()
-    }
-
-    //IF SUCCESS
-    async success (message, data) {
-        const result = {success: true, message: message, result: data}
-        return result
-    }
-
-    //IF ERROR
-    async error (message, status) {
-        const result = {success: false, area: 'Product-Service', tryError: message, status: status}
-        return result
+        this.area = 'productRepository'
     }
     
     //ALL PRODUCTS
@@ -24,34 +14,34 @@ export default class ProductRepository {
 
         if (limit){
             if (!isNaN(limit) && limit > 0){
-                if(limit > products.length) return await this.error(`limit is above the number of products (${products.length})`, 404)
+                if(limit > products.length) return await error(`limit is above the number of products (${products.length})`, 404, this.area)
                 
                 const sliceProducts = products.slice(0, limit)
-                return await this.success('Se han encontrado correctamente los productos', sliceProducts)
+                return await success('Se han encontrado correctamente los productos', sliceProducts, this.area)
             }else{
-                if(isNaN(limit)) return await this.error('limit has to be a number', 400)
-                else return await this.error('limit has to be above 0', 400)
+                if(isNaN(limit)) return await error('limit has to be a number', 400, this.area)
+                else return await error('limit has to be above 0', 400, this.area)
             }
         }else
-        return await this.success('Se han encontrado correctamente los productos', products)
+        return await success('Se han encontrado correctamente los productos', products, this.area)
     }
 
     //SPECIFIC PRODUCT
     async getProductById (id) {//CHECK
-        if (id <= 0) return await this.error('ID has to be above 0', 400)
+        if (id <= 0) return await error('ID has to be above 0', 400, this.area)
         
         const productById = await this.dao.getProductById(id)
 
-        if (productById === null) return await this.error( 'ProductID not found', 404)
-        else return await this.success('El producto se encontro correctamente', productById)
+        if (productById === null) return await error( 'ProductID not found', 404, this.area)
+        else return await success('El producto se encontro correctamente', productById, this.area)
     }
 
     //POST PRODUCT
     async createProduct (data) {//CHECK
         const create = await this.dao.createProduct(data)
         
-        if(!create) return await this.error('No se ha creado correctamente el producto', 400)
-        else return await this.success('Se ha creado correctamente el producto', create)
+        if(!create) return await error('No se ha creado correctamente el producto', 400, this.area)
+        else return await success('Se ha creado correctamente el producto', create, this.area)
     }
     
     //CHANGE PRODUCT
@@ -67,8 +57,8 @@ export default class ProductRepository {
         }
         const newProduct = await this.dao.updateProduct(toUpdate)
 
-        if (!newProduct) return await this.error('No se ha modificado correctamente el producto', 400)
-        else return await this.success('Se ha modificado correctamente el producto', newProduct)
+        if (!newProduct) return await error('No se ha modificado correctamente el producto', 400, this.area)
+        else return await success('Se ha modificado correctamente el producto', newProduct, this.area)
     }
 
     //ERASE PRODUCT
@@ -79,8 +69,8 @@ export default class ProductRepository {
 
         const product = await this. dao.deleteProduct(id)
 
-        if (product.deletedCount > 0) return await this.success('Se ha eliminado correctamente el producto', exist.result)//LE AGREGAMOS EL .RESULT
-        else return await this.error('No se ha eliminado correctamente el producto', 400)
+        if (product.deletedCount > 0) return await success('Se ha eliminado correctamente el producto', exist.result, this.area)//LE AGREGAMOS EL .RESULT
+        else return await error('No se ha eliminado correctamente el producto', 400, this.area)
     }
 
     async queryParams (req) {

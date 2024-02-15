@@ -1,6 +1,8 @@
 import fs from 'fs'
 import ProductManager from './ProductManager.js'
 import TicketDTO from '../../../dto/file/ticket.dto.js'
+import { logger } from '../../../utils/logger.js'
+import { error } from '../../../utils.js'
 
 class CartManager{
     constructor(){
@@ -8,6 +10,7 @@ class CartManager{
         this.filename = './dao/file/dataBase/carts.json'
         this._format = 'utf-8'
         this.prodManager = new ProductManager()
+        this.area = 'CartManager'
     }
 
     lastId = async (file = this.filename) => {
@@ -18,7 +21,8 @@ class CartManager{
             }, 0)
             return maxId
         }
-        catch (error){
+        catch (e){
+            logger.fatal(await error('Error generating and ID', 500, this.area, e))
             throw new Error ('No se ha generado un ID')
         }
     }
@@ -42,9 +46,17 @@ class CartManager{
 
     fileContent = async (path, format) => {//CHECK
         const list = await fs.promises.readFile(path, format)
+        if (list.trim() === '') {
+            logger.fatal(await error(`Database ${this.filename} no tiene ningun dato`, 500, this.area))
+            throw new Error (`La dataBase ${this.filename} no tiene ningun dato`)
+        }
+
         const parse = JSON.parse(list)
         
-        if (!Array.isArray(parse)) throw new Error ('La dataBase tiene un formato erroneo')
+        if (!Array.isArray(parse)) {
+            logger.fatal(await error(`Database ${this.filename} tiene un formato erroneo`, 500, this.area))
+            throw new Error ('La dataBase tiene un formato erroneo')
+        }
         
         return parse
     }
@@ -110,7 +122,10 @@ class CartManager{
             const pid = query["products.product"]
             const quant = key.quantity
 
-            if (typeof (quant) !== 'number') throw new Error ('Quantity debe ser un numero')
+            if (typeof (quant) !== 'number') {
+                logger.warning(await error ('Quantity must be a number', 400, this.area))
+                throw new Error ('Quantity debe ser un numero')
+            }
 
             const method = options.method
             const increaseQuant = await this.increaseQuant(cid, pid, quant, method)
@@ -124,7 +139,10 @@ class CartManager{
             const write = await fs.promises.writeFile(this.filename, JSON.stringify(list, null, 2))
     
             if(write === undefined) return list[idx]
-            else throw new Error ('No se ha podido modificar el carrito - Body recibe "[{"product": "productID"}]"')
+            else {
+                logger.error(await error('No se ha podido modificar el carrito - Body recibe "[{"product": "productID"}]"', 500, this.area))
+                throw new Error ('No se ha podido modificar el carrito - Body recibe "[{"product": "productID"}]"')
+            }
         }
         else if (key.result === 'create') {//ADD NEW PRODUCT TO CART
             const pid = key.pid
@@ -172,7 +190,10 @@ class CartManager{
         const idx = list.findIndex(d => d.id === parseInt(parseInt(cid)))
         const eliminatedProduct = (list[idx].products.filter(p => p.product === parseInt(pid)))
 
-        if (eliminatedProduct.length === 0) throw new Error ('El producto no existe en el carrito')
+        if (eliminatedProduct.length === 0) {
+            logger.warning(await error ('El producto no existe en el carrito', 404, this.area))
+            throw new Error ('El producto no existe en el carrito')
+        }
 
         list[idx].products = list[idx].products.filter(p => p.product !== parseInt(pid))
         const write = await fs.promises.writeFile(this.filename, JSON.stringify(list, null, 2))

@@ -1,10 +1,13 @@
 import fs from 'fs'
+import { error } from '../../../utils.js'
+import { logger } from '../../../utils/logger.js'
 
 class ProductManager{
     constructor(){
         this._products = []
         this.filename = './dao/file/dataBase/products.json'
         this._format = 'utf-8'
+        this.area = 'ProductManager'
     }
 
     lastId = async () => {
@@ -15,7 +18,8 @@ class ProductManager{
             }, 0)
             return maxId
         }
-        catch (error){
+        catch (e){
+            logger.fatal(await error('Error generating and ID', 500, this.area, e))
             throw new Error ('No se ha generado un ID')
         }
     }
@@ -43,11 +47,19 @@ class ProductManager{
         return false
     }
 
-    fileContent = async (path, format) => {
+    fileContent = async (path, format) => {//CHECK
         const list = await fs.promises.readFile(path, format)
+        if (list.trim() === '') {
+            logger.fatal(await error(`Database ${this.filename} no tiene ningun dato`, 500, this.area))
+            throw new Error (`La dataBase ${this.filename} no tiene ningun dato`)
+        }
+
         const parse = JSON.parse(list)
         
-        if (!Array.isArray(parse)) throw new Error ('La dataBase tiene un formato erroneo')
+        if (!Array.isArray(parse)) {
+            logger.fatal(await error(`Database ${this.filename} tiene un formato erroneo`, 500, this.area))
+            throw new Error ('La dataBase tiene un formato erroneo')
+        }
         
         return parse
     }
@@ -72,14 +84,20 @@ class ProductManager{
     }
     
     createProduct = async (data) => {
-        if (Object.keys(data).length === 0) throw new Error ('body vacio')
+        if (Object.keys(data).length === 0){
+            logger.warning(await error('Body is empty', 400, this.area))
+            throw new Error ('body vacio')
+        } 
 
         const list = await this.getProducts()
         const id = await this.lastId() + 1
         const code = await this.codeInUse(data)
         const newCode = await this.uniqueCode()
 
-        if (code) throw new Error (`CODE already in use - Try using: ${newCode}`)
+        if (code) {
+            logger.error(`CODE already in use`, 409, this.area)
+            throw new Error (`CODE already in use - Try using: ${newCode}`)
+        }
 
         data.id = id
         const pushear = list.push(data)
@@ -97,16 +115,23 @@ class ProductManager{
         const idx = list.findIndex(d => d.id === parseInt(query._id || query.id))
         const newCode = await this.uniqueCode()
         const key = await this.keyValue(update)
-        if (!key) throw new Error ('Modifying the ID directly is not allowed')
+        if (!key) {
+            logger.warning(await error('No se puede modificar el ID de un producto', 400, this.area))
+            throw new Error ('Modifying the ID directly is not allowed')
+        }
         if (key.success){
             const exist = await this.codeInUse(key.result)
-            if (exist) throw new Error (`CODE already in use - Try using: '${newCode}'`)
+            if (exist) {
+                logger.warning(`CODE already in use`, 409, this.area)
+                throw new Error (`CODE already in use - Try using: '${newCode}'`)
+            }
         }
 
         const validProperties = ['title', 'description', 'price', 'thumbnail', 'code', 'category', 'stock', 'status']
     
         for (const prop in key.result){
             if (!validProperties.includes(prop)) {
+                logger.error('Cannot add property', 500, this.area)
                 throw new Error(`Cannot add property '${prop}'`)
             }
         }

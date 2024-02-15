@@ -1,30 +1,21 @@
+import { error, success } from "../utils.js"
+
 class ChatRepository {
     constructor(dao) {
         this.dao = dao
-    }
-
-    //IF SUCCESS
-    async success (message, data) {
-        const result = {success: true, message: message, result: data}
-        return result
-    }
-
-    //IF ERROR
-    async error (message, status) {
-        const result = {success: false, area: 'Chat-Service', tryError: message, status: status}
-        return result
+        this.area = 'chatRepository'
     }
 
     async getChat () {
         const messages = await this.dao.getChat()
-        return await this.success('Se cargaron todos los chats', messages)
+        return await success('Se cargaron todos los chats', messages, this.area)
     }
 
     async postChat (data) {
         const message = await this.dao.postChat(data)
 
-        if (!message) return await this.error('Ha ocurrido un error al postear un mensaje', 500)
-        else return await this.success('Se ha creado el mensaje', message)
+        if (!message) return await error('Ha ocurrido un error al postear un mensaje', 500, this.area)
+        else return await success('Se ha creado el mensaje', message, this.area)
     }
 }
 
