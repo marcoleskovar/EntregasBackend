@@ -8,5 +8,7 @@ export default {
     mongoURL: process.env.MONGO_URL,
     dbName: process.env.DB_NAME,
     adminEmail: process.env.ADMIN_EMAIL,
-    adminPassword: process.env.ADMIN_PASSWORD
+    adminPassword: process.env.ADMIN_PASSWORD,
+    mail: process.env.MAIN_MAIL,
+    mailPassword: process.env.MAIN_MAIL_PASS,
 }

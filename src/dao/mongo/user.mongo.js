@@ -7,4 +7,5 @@ export default class User {
     async getByEmail (email) {return this.model.findOne({email: email})}
     async getByUsername (username) {return this.model.findOne({username: username})}
     async createUser (user) {return this.model.create(user)}
+    async updateUser ({query, update, options}) {return this.model.findOneAndUpdate(query, update, options)}
 }

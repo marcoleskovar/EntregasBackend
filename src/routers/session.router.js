@@ -1,6 +1,6 @@
 import { Router } from "express"
 import passport from "passport"
-import { getCurrent, getGithub, getGithubCallback, getGithubError, getLogin, getRegister, postLogin, postRegister } from "../controllers/session.controller.js"
+import { getCurrent, getGithub, getGithubCallback, getGithubError, getLogin, getRegister, postLogin, postRegister, recoverMail, recover } from "../controllers/session.controller.js"
 
 const router = Router()
 
@@ -24,5 +24,9 @@ router.get('/current', getCurrent)
 router.post('/login', passport.authenticate('login'), postLogin)
 
 router.post('/register', passport.authenticate('register'), postRegister)
+
+router.post('/recover/mail', recoverMail)
+
+router.post('/recover/:token', recover)
 
 export default router

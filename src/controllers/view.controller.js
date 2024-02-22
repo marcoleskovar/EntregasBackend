@@ -3,6 +3,7 @@ import { generateMockingProds } from "../utils.js"
 import ViewsManager from "../dao/file/managers/ViewsManager.js"
 import { logger } from "../utils/logger.js"
 import { error } from "../utils.js"
+import jwt from 'jsonwebtoken'
 
 const manager = new ViewsManager()
 const area = 'viewController'
@@ -88,6 +89,18 @@ export const logoutView = async (req, res) => {
         if(err) return res.send('Logout error')
         return res.redirect('/session/login')
     })   
+}
+
+export const recoverMail = async (req, res) => {
+    return res.render('passwordmail', {})
+}
+
+export const resetPassword = async (req, res) => {
+    const token = req.params.token
+    jwt.verify(token, 'secret', (err, decoded) => {
+        if (err) return res.render('error_recover', {})
+        return res.render('recover', {token})
+    })
 }
 
 export const testLogs = async (req, res) => {
