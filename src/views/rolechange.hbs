@@ -1,0 +1,9 @@
+<h1>Cambiar de rol</h1>
+<p>Tu rol actual es: {{user.role}}</p>
+<form action="/api/users/premium/{{user._id}}" method="POST">
+    <select name="role" type="text">
+        <option value="user">User</option>
+        <option value="premium">Premium</option>
+    </select>
+    <button type="submit">DONE</button>
+</form>

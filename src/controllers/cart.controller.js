@@ -50,12 +50,13 @@ export const addToCart = async (req, res) => {
     try {
         const cid = req.params.cid
         const pid = req.params.pid
+        const user = req.session.user
 
         const product = await ProductService.getProductById(pid)
 
         if (!product.success) return res.status(product.status).json(product)
 
-        const result = await service.addToCart(cid, product.result)
+        const result = await service.addToCart(cid, product.result, user)
 
         if (!result.success) return res.status(result.status).json(result)
         else return res.status(200).json(result)

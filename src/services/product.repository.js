@@ -37,7 +37,8 @@ export default class ProductRepository {
     }
 
     //POST PRODUCT
-    async createProduct (data) {//CHECK
+    async createProduct (data, user) {//CHECK
+        if (user && user.role === 'premium') data.owner = user.email
         const create = await this.dao.createProduct(data)
         
         if(!create) return await error('No se ha creado correctamente el producto', 400, this.area)
@@ -62,12 +63,16 @@ export default class ProductRepository {
     }
 
     //ERASE PRODUCT
-    async deleteProduct (id) {//CHECK
+    async deleteProduct (id, user) {//CHECK
         const exist = await this.getProductById(id)
 
         if (!exist.success) return exist
 
-        const product = await this. dao.deleteProduct(id)
+        if (user.role === 'premium') {
+            if (exist.result.owner !== user.email){return await error ('Este producto no es tuyo', 400, this.area)}
+        }
+
+        const product = await this.dao.deleteProduct(id)
 
         if (product.deletedCount > 0) return await success('Se ha eliminado correctamente el producto', exist.result, this.area)//LE AGREGAMOS EL .RESULT
         else return await error('No se ha eliminado correctamente el producto', 400, this.area)

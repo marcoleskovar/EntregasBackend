@@ -10,7 +10,7 @@ router.get('/:cid', auth, getCartById)
 
 router.post('/', createCart)
 
-router.post('/:cid/products/:pid', auth, authRole('user'), addToCart)
+router.post('/:cid/products/:pid', auth, authRole('user', 'premium'), addToCart)
 
 router.put('/:cid', auth, updateCart)
 

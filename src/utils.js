@@ -44,7 +44,9 @@ export const validateUser = async (email) => {
 }
 
 export const rol = async (email, password) => {
+    console.log(email)
     if(email === config.adminEmail && password === config.adminPassword) return 'admin'
+    if (email === config.premiumEmail) return 'premium'
     else return 'user'
 }
 
@@ -53,10 +55,10 @@ export const auth = (req, res, next) => {
     res.redirect('/session/login')
 }
 
-export const authRole = (role) => {
+export const authRole = (...role) => {
     return async (req, res, next) => {
         const user = new CurrentDTO (req.session.user)
-        if (user.role != role) return res.status(401).json({ error: 'Unauthorized' })
+        if (!role.includes(user.role)) return res.status(401).json({ error: 'Unauthorized' })
         return next()
     }
 }

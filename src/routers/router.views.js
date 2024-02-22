@@ -8,7 +8,7 @@ router.get('/', auth, homeView)
 
 router.get('/products', auth, productsView)
 
-router.get('/realTimeProducts', auth, authRole('admin'), realTimeProductsView)
+router.get('/realTimeProducts', auth, authRole('admin', 'premium'), realTimeProductsView)
 
 router.get('/cart', auth, cartView)
 

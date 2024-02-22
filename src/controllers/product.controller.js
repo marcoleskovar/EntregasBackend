@@ -37,9 +37,10 @@ export const getProductById = async (req, res) => {//CHECK
 export const createProduct = async (req, res) => {//CHECK
     try {
         const data = req.body
+        const user = req.session.user
         const dto = new ProductDTO(data)
 
-        const result = await service.createProduct(dto)
+        const result = await service.createProduct(dto, user)
 
         if (!result.success) return res.status(result.status).json(result)
         else return res.status(200).json(result)
@@ -68,7 +69,8 @@ export const updateProduct = async (req, res) => {//CHECK
 export const deleteProduct = async (req, res) => {//CHECK
     try {
         const id = req.params.pid
-        const result = await service.deleteProduct(id)
+        const user = req.session.user
+        const result = await service.deleteProduct(id, user)
 
         if (!result.success) return res.status(result.status).json(result)
         else return res.status(200).json(result)

@@ -36,6 +36,10 @@ const productsSchema = new mongoose.Schema({
     status: {
         type: Boolean,
         default: true
+    },
+    owner: {
+        type: String,
+        default: 'admin'
     }
 }, {
     versionKey: false

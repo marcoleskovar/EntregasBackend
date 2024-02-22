@@ -15,6 +15,7 @@ import {logger, addLogger} from './utils/logger.js'
 //IMPORT ROUTERS
 import productsRouter from './routers/product.router.js'
 import cartRouter from './routers/cart.router.js'
+import userRouter from './routers/user.router.js'
 import sessionRouter from './routers/session.router.js'
 import viewsRouter from './routers/router.views.js'
 import chatRouter from './routers/chat.router.js'
@@ -58,6 +59,7 @@ app.use('/static', express.static(__dirname + '/public'))
 app.use('/', viewsRouter)
 app.use('/api/products', productsRouter)
 app.use('/api/carts', cartRouter)
+app.use('/api/users', userRouter)
 app.use('/session', sessionRouter) 
 app.use('/chat', chatRouter)
 

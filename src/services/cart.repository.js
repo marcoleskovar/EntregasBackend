@@ -34,10 +34,12 @@ export default class CartRepository {
     }
 
     //ADD PRODUCT TO CART
-    async addToCart (cid, productData) {//CHECK-DONE
+    async addToCart (cid, productData, user) {//CHECK-DONE
         const cart = await this.getCartById(cid)
         
         if(!cart.success) return cart
+
+        if (productData.owner === user.email) return await error ('No podes agregar tus propios productos al carro', 400, this.area)
 
         const updateQuery = {
             query: {_id: cid, "products.product": productData._id || productData.id},
