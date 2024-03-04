@@ -41,7 +41,7 @@ export default class ProductRepository {
         if (user && user.role === 'premium') data.owner = user.email
         const create = await this.dao.createProduct(data)
         
-        if(!create) return await error('No se ha creado correctamente el producto', 400, this.area)
+        if(!create) return await error('No se ha creado correctamente el producto', 500, this.area)
         else return await success('Se ha creado correctamente el producto', create, this.area)
     }
     

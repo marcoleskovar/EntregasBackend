@@ -1,0 +1,221 @@
+paths:
+  /api/products:
+    get:
+      summary: Obtiene todos los productos de la DB
+      tags:
+        - Productos
+      responses:
+        "200":
+          description: Se han encontrado todos los productos
+          content:
+            application/json:
+              schema:
+                type: array
+                items: 
+                  $ref: '#components/schemas/producto'
+        "400":
+          description:  Hubo una solicitud incorrecta
+        "404":
+          description:  Querys incorrectos ingresados
+        "500":
+          description: Error en el servidor
+    post:
+      summary: Crea un producto nuevo
+      tags:
+        - Productos
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#components/requestBodies/createProduct"
+      responses:
+        "200":
+          description: Se ha creado correctamente el producto
+          content: 
+            application/json:
+              schema:
+                type: object
+                $ref: '#components/schemas/producto'
+        "500":
+          description: Error en el servidor
+  /api/products/{pid}:
+    get:
+      summary: Obtiene un producto por ID
+      tags:
+      - Productos
+      parameters:
+      - name: pid
+        in: path
+        required: true
+        description: 'ID del producto solicitado'
+        schema:
+          type: string
+      responses:
+        "200":
+          description: Se ha encontrado el producto por su ID
+          content:
+            application/json:
+              schema:
+                type: array
+                items: 
+                  $ref: '#components/schemas/producto'
+        "400":
+          description: Hubo una solicitud incorrecta
+        "404":
+          description: No se encontro al producto por su ID
+        "500":
+          description: Error en el servidor
+    put:
+      summary: Modifica campos especificos de un producto obtenido por su ID
+      tags:
+        - Productos
+      parameters:
+      - name: pid
+        in: path
+        required: true
+        description: 'ID del producto solicitado'
+        schema:
+          type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#components/requestBodies/updateProduct'
+    delete:
+      summary: Elimina producto por su ID
+      tags:
+        - Productos
+      parameters:
+      - name: pid
+        in: path
+        required: true
+        description: 'ID del producto solicitado'
+        schema:
+          type: string
+      responses:
+        "200":
+          description: Se han eliminado el producto por su ID
+          content:
+            application/json:
+              schema:
+                type: array
+                items: 
+                  $ref: '#components/schemas/producto'
+        "400":
+          description: Hubo una solicitud incorrecta
+        "404":
+          description: No se encontro al producto por su ID
+        "500":
+          description: Error en el servidor
+
+
+
+components:
+  schemas:
+    producto:
+      type: object
+      properties:
+        _id:
+          type: ObjectId
+          description: ID del producto
+        title:
+          type: string
+          description: Nombre del producto
+        description: 
+          type: string
+          description: Descripcion del producto
+        price:
+          type: number
+          description: Precio del producto
+        thumbail:
+          type: array
+          description: Imagenes del producto
+        code:
+          type: string
+          description: Codigo unico del producto
+        category:
+          type: string,
+          description: Categoria del producto
+        stock:
+          type: number
+          description: Stock del producto
+        status:
+          type: boolean
+          description: Disponibilidad del producto
+        owner:
+          type: string
+          description: Email del creador del producto
+      example:
+        id_: ObjectId('65d6a7d8e7fd6c4f397b91f0')
+        title: Producto X
+        description: Descripcion Producto X
+        price: 999
+        thumbnail: []
+        code: XX1
+        category: Shoes
+        stock: 1
+        status: true
+        owner: X@gmail.com
+  requestBodies:
+    createProduct:
+      type: object
+      properties:
+        title:
+          type: string
+          description: Nombre del producto
+        description: 
+          type: string
+          description: Descripcion del producto
+        price:
+          type: number
+          description: Precio del producto
+        code:
+          type: string
+          description: Codigo unico del producto
+        category:
+          type: string,
+          description: Categoria del producto
+        stock:
+          type: number
+          description: Stock del producto
+        status:
+          type: boolean
+          description: Disponibilidad del producto
+      example:
+        title: Producto X
+        description: Descripcion Producto X
+        price: 999
+        thumbnail: []
+        code: XX1
+        category: Shoes
+        stock: 1
+        status: true
+    updateProduct:
+      type: object
+      properties:
+        title:
+          type: string
+          description: Nombre del producto
+        description: 
+          type: string
+          description: Descripcion del producto
+        price:
+          type: number
+          description: Precio del producto
+        code:
+          type: string
+          description: Codigo unico del producto
+        category:
+          type: string,
+          description: Categoria del producto
+        stock:
+          type: number
+          description: Stock del producto
+        status:
+          type: boolean
+          description: Disponibilidad del producto
+      example:
+        title: Nuevo nombre del Producto X
+        category: Nueva Categoria del producto X
