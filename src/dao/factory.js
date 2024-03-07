@@ -12,7 +12,10 @@ logger.info(`Persistence: ${opts.persistence}`)
 
 switch (opts.persistence) {
     case 'MONGO':
-        await mongoose.connect(config.mongoURL, {dbName: config.dbName})
+        let mongoDBName;
+        if (opts.env === 'DEV') mongoDBName = 'test-ecommerce'
+        else mongoDBName = config.dbName
+        await mongoose.connect(config.mongoURL, {dbName: mongoDBName})
             .then(() => {logger.info('Mongo connected')})
             .catch((err) => {return logger.fatal({message: 'Error connecting to Mongo', status: 500, area: 'factory', detail: err})})
         

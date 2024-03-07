@@ -77,7 +77,7 @@ export default class UserRepository {
             <a href="${link}">Haga click para reestablecer su contraseña</a>`
 
         const result = new Mail().send(userMail, "Reestablecer contraseña", html)
-        return result
+        return await success ('Se ha enviado el mail', result, this.area)
     }
 
     async recover (email, passwords) {

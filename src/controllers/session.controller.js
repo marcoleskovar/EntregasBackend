@@ -1,6 +1,6 @@
 import CurrentDTO from "../dto/file/current.dto.js"
 import { UserService } from "../services/service.js"
-import { error } from "../utils.js"
+import { error, success } from "../utils.js"
 import { logger } from "../utils/logger.js"
 import jwt from 'jsonwebtoken'
 
@@ -24,11 +24,8 @@ export const getGithubError = (req, res) => {
 }
 
 export const getCurrent = (req, res) => {
-    if(req.session?.user){
-        const user = new CurrentDTO(req.session.user)
-        return res.send(user)
-    }
-    else res.redirect('/session/login')
+    const user = new CurrentDTO(req.session.user)
+    return res.send(user)
 }
 
 export const postLogin = async (req, res) => {
@@ -59,7 +56,9 @@ export const recoverMail = async (req, res) => {
         const email = req.body
         const token = jwt.sign({email}, 'secret', {expiresIn: '1h'})
         const newLink = `http://127.0.0.1:8080/recover/${token}`
-        await UserService.recoverMail(email, newLink)
+        const result = await UserService.recoverMail(email, newLink)
+        if (!result.success) return res.status(result.status).send(result)
+        else return res.status(200).send({result, token})
     } catch (e) {
         const err = await error ('Error in recoverMail', 500, 'sessionController', e)
         logger.error (err)
@@ -80,7 +79,7 @@ export const recover = async (req, res) => {
                 return 
             } 
         })
-        res.redirect('/session/login')
+        return res.redirect('/session/login')
     } catch (e) {
         const err = await error ('Error in recover', 500, 'sessionController', e)
         logger.error (err)

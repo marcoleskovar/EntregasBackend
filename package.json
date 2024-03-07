@@ -6,6 +6,7 @@
   "type": "module",
   "scripts": {
     "dev": "nodemon src/app.js --persistence MONGO --env DEV",
+    "prod": "nodemon src/app.js --persistence MONGO --env PROD",
     "test": "npx mocha src/test/supertest.test.js"
   },
   "author": "",
@@ -39,6 +40,7 @@
   },
   "devDependencies": {
     "chai": "^5.1.0",
+    "chai-http": "^4.4.0",
     "mocha": "^10.3.0",
     "supertest": "^6.3.4"
   }

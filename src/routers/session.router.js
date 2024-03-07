@@ -1,6 +1,7 @@
 import { Router } from "express"
 import passport from "passport"
 import { getCurrent, getGithub, getGithubCallback, getGithubError, getLogin, getRegister, postLogin, postRegister, recoverMail, recover } from "../controllers/session.controller.js"
+import { auth } from "../utils.js"
 
 const router = Router()
 
@@ -19,7 +20,7 @@ router.get('/githubcallback', passport.authenticate('github' , {failureRedirect:
 
 router.get('/githuberror', getGithubError)
 
-router.get('/current', getCurrent)
+router.get('/current', auth, getCurrent)
 
 router.post('/login', passport.authenticate('login'), postLogin)
 
